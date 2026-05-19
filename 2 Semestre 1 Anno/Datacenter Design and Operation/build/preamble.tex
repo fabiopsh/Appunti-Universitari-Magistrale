@@ -1,0 +1,105 @@
+% --- Immagini: size cap pi\`u stretto ---
+\usepackage{graphicx}
+\graphicspath{{images/}{./images/}}
+% Ridefinisco \pandocbounded per limitare immagini a 0.78\linewidth x 0.42\textheight
+\makeatletter
+\AtBeginDocument{%
+  \renewcommand*\pandocbounded[1]{%
+    \sbox\pandoc@box{#1}%
+    \Gscale@div\@tempa{\dimexpr 0.42\textheight\relax}{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
+    \Gscale@div\@tempb{\dimexpr 0.78\linewidth\relax}{\wd\pandoc@box}%
+    \ifdim\@tempb\p@<\@tempa\p@\let\@tempa\@tempb\fi
+    \ifdim\@tempa\p@<\p@\scalebox{\@tempa}{\usebox\pandoc@box}%
+    \else\usebox{\pandoc@box}%
+    \fi
+  }%
+}
+\makeatother
+
+% --- Layout / tipografia ---
+\usepackage{microtype}
+\usepackage{emptypage}
+\usepackage{parskip}
+
+% --- Tabelle ---
+\usepackage{longtable,booktabs,array}
+\usepackage{makecell}
+
+% --- Colori e callout boxes ---
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{breakable,skins}
+
+\definecolor{calloutNoteBorder}{HTML}{2962FF}
+\definecolor{calloutNoteBg}{HTML}{E8F0FE}
+\definecolor{calloutTipBorder}{HTML}{00897B}
+\definecolor{calloutTipBg}{HTML}{E0F2F1}
+\definecolor{calloutWarnBorder}{HTML}{F57C00}
+\definecolor{calloutWarnBg}{HTML}{FFF3E0}
+\definecolor{calloutImpBorder}{HTML}{D32F2F}
+\definecolor{calloutImpBg}{HTML}{FFEBEE}
+\definecolor{calloutQuestBorder}{HTML}{7B1FA2}
+\definecolor{calloutQuestBg}{HTML}{F3E5F5}
+\definecolor{calloutDefBorder}{HTML}{1565C0}
+\definecolor{calloutDefBg}{HTML}{E3F2FD}
+\definecolor{calloutThmBorder}{HTML}{283593}
+\definecolor{calloutThmBg}{HTML}{E8EAF6}
+
+\newtcolorbox{calloutnote}[1]{
+  enhanced, breakable, colback=calloutNoteBg, colframe=calloutNoteBorder,
+  boxrule=0.4pt, leftrule=3pt, arc=2pt, left=8pt, right=8pt, top=4pt, bottom=4pt,
+  title={\textbf{\textsf{Nota}\ifx\relax#1\relax\else\ -- #1\fi}}, fonttitle=\normalsize,
+  coltitle=calloutNoteBorder, colbacktitle=calloutNoteBg, boxsep=2pt, before skip=8pt, after skip=8pt
+}
+\newtcolorbox{callouttip}[1]{
+  enhanced, breakable, colback=calloutTipBg, colframe=calloutTipBorder,
+  boxrule=0.4pt, leftrule=3pt, arc=2pt, left=8pt, right=8pt, top=4pt, bottom=4pt,
+  title={\textbf{\textsf{Tip}\ifx\relax#1\relax\else\ -- #1\fi}}, fonttitle=\normalsize,
+  coltitle=calloutTipBorder, colbacktitle=calloutTipBg, boxsep=2pt, before skip=8pt, after skip=8pt
+}
+\newtcolorbox{calloutwarning}[1]{
+  enhanced, breakable, colback=calloutWarnBg, colframe=calloutWarnBorder,
+  boxrule=0.4pt, leftrule=3pt, arc=2pt, left=8pt, right=8pt, top=4pt, bottom=4pt,
+  title={\textbf{\textsf{Attenzione}\ifx\relax#1\relax\else\ -- #1\fi}}, fonttitle=\normalsize,
+  coltitle=calloutWarnBorder, colbacktitle=calloutWarnBg, boxsep=2pt, before skip=8pt, after skip=8pt
+}
+\newtcolorbox{calloutimportant}[1]{
+  enhanced, breakable, colback=calloutImpBg, colframe=calloutImpBorder,
+  boxrule=0.4pt, leftrule=3pt, arc=2pt, left=8pt, right=8pt, top=4pt, bottom=4pt,
+  title={\textbf{\textsf{Importante}\ifx\relax#1\relax\else\ -- #1\fi}}, fonttitle=\normalsize,
+  coltitle=calloutImpBorder, colbacktitle=calloutImpBg, boxsep=2pt, before skip=8pt, after skip=8pt
+}
+\newtcolorbox{calloutquestion}[1]{
+  enhanced, breakable, colback=calloutQuestBg, colframe=calloutQuestBorder,
+  boxrule=0.4pt, leftrule=3pt, arc=2pt, left=8pt, right=8pt, top=4pt, bottom=4pt,
+  title={\textbf{\textsf{Domanda}\ifx\relax#1\relax\else\ -- #1\fi}}, fonttitle=\normalsize,
+  coltitle=calloutQuestBorder, colbacktitle=calloutQuestBg, boxsep=2pt, before skip=8pt, after skip=8pt
+}
+\newtcolorbox{calloutdefinition}[1]{
+  enhanced, breakable, colback=calloutDefBg, colframe=calloutDefBorder,
+  boxrule=0.4pt, leftrule=3pt, arc=2pt, left=8pt, right=8pt, top=4pt, bottom=4pt,
+  title={\textbf{\textsf{Definizione}\ifx\relax#1\relax\else\ -- #1\fi}}, fonttitle=\normalsize,
+  coltitle=calloutDefBorder, colbacktitle=calloutDefBg, boxsep=2pt, before skip=8pt, after skip=8pt
+}
+\newtcolorbox{callouttheorem}[1]{
+  enhanced, breakable, colback=calloutThmBg, colframe=calloutThmBorder,
+  boxrule=0.4pt, leftrule=3pt, arc=2pt, left=8pt, right=8pt, top=4pt, bottom=4pt,
+  title={\textbf{\textsf{Teorema}\ifx\relax#1\relax\else\ -- #1\fi}}, fonttitle=\normalsize,
+  coltitle=calloutThmBorder, colbacktitle=calloutThmBg, boxsep=2pt, before skip=8pt, after skip=8pt
+}
+
+% --- Hyperref: TOC cliccabile, link colorati ---
+\usepackage[unicode,colorlinks=true,linkcolor=black,urlcolor=blue,citecolor=blue,bookmarksnumbered=true,bookmarksopen=true]{hyperref}
+
+% --- Header pagine ---
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LE,RO]{\thepage}
+\fancyhead[RE]{\nouppercase{\leftmark}}
+\fancyhead[LO]{\nouppercase{\rightmark}}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% --- Profondit\`a TOC e numerazione ---
+\setcounter{tocdepth}{2}
+\setcounter{secnumdepth}{2}
