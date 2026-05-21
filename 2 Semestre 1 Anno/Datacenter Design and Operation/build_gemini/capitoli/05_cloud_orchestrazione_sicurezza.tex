@@ -8,6 +8,15 @@
 \end{figure}
 Il cloud computing rappresenta non solo un cambio tecnologico, ma un profondo mutamento nel modello di business IT: si passa dall'acquisto di hardware (CapEx) al pagamento per consumo di un servizio (OpEx).
 
+\begin{tipbox}[Le Sfide della Pubblica Amministrazione]
+Costruire un cloud per un'azienda nativa digitale o per la Pubblica Amministrazione (PA) sono due sfide opposte. Una startup opera in ambiente \textbf{Greenfield} (si parte da zero con standard moderni). La PA opera tipicamente in \textbf{Brownfield}: deve migrare nel cloud applicativi e mainframe vecchi di decenni senza interrompere servizi critici ai cittadini. Inoltre subentrano ostacoli strutturali:
+\begin{itemize}
+    \item \textbf{Governance:} Modello centralizzato (più sicuro ed economico su scala nazionale) vs Federato (politicamente preferito dagli enti locali che non vogliono cedere il controllo sui propri dati).
+    \item \textbf{Chargeback:} Come ripartire esattamente i costi (fatturazione interna) tra dipartimenti/ministeri diversi che condividono lo stesso hardware senza generare contenziosi.
+    \item \textbf{Procurement:} L'acquisto di hardware fisico nei cloud on-premise della PA richiede estenuanti gare d'appalto pubbliche (con ritardi medi di 1-2 anni), rendendo il server acquistato già tecnologicamente obsoleto nel momento in cui viene fisicamente consegnato nel datacenter.
+\end{itemize}
+\end{tipbox}
+
 \subsection{Definizione e Caratteristiche (NIST)}
 Secondo il NIST, il cloud è caratterizzato da:
 \begin{itemize}
@@ -62,11 +71,21 @@ I parametri principali sono:
 \end{itemize}
 
 \subsection{Tecniche di Resilienza e Limiti Geografici}
-Per evitare i \textbf{SPOF (Single Point of Failure)}, si usano tecniche di ridondanza:
+Per evitare i \textbf{SPOF (Single Point of Failure)}, si usano tecniche di ridondanza su più livelli:
 \begin{itemize}
+    \item \textbf{Failover di Servizio vs Replicazione VM:} Il \textit{Service Failover} tradizionale (es. Windows Server Failover Cluster) si basa su un nodo secondario passivo; se il primario muore, il secondario monta lo storage condiviso e fa un lento reboot a freddo dell'applicativo (con RTO di minuti). La \textit{Replica VM} o la \textbf{Continuous Data Protection (CDP)} operano invece a un livello inferiore. Un CDP inietta un driver (\textit{Write Splitter}) nell'hypervisor che biforca ogni scrittura I/O: una copia va al disco locale, l'altra via rete asincrona al sito di Disaster Recovery. Utilizza un \textit{Journal Volume} per mantenere una cronologia granulare al secondo, permettendo di "riavvolgere" nel tempo l'intera VM a 5 secondi prima di un eventuale attacco ransomware.
     \item \textbf{Active/Active vs Active/Passive:} L'approccio Active/Passive usa un nodo secondario in standby. L'approccio Active/Active distribuisce il carico simultaneamente su più datacenter geografici, ma incontra un grave limite fisico dettato dalla velocità della luce nella fibra ottica.
     \item \textbf{Replica Sincrona vs Asincrona:} Affinché due datacenter operino in vero Active/Active (senza corrompere i database condivisi), la replica dello storage deve essere \textbf{Sincrona} (la scrittura viene confermata al client solo dopo che entrambi i siti geografici l'hanno salvata). Per far ciò senza paralizzare le applicazioni, il tempo di latenza (\textit{Round-Trip Time}) tra i datacenter non deve superare i \textbf{10-15 millisecondi}, il che obbliga i siti a non distare più di $\sim$100-150 km l'uno dall'altro. Per distanze superiori (es. tra continenti), si è obbligati a usare la replica \textbf{Asincrona} (dove c'è una finestra di vulnerabilità, RPO > 0), poiché l'attesa del segnale luminoso renderebbe il sistema inutilizzabile.
     \item \textbf{Availability Zones:} Divisione in zone distinte (spesso in datacenter diversi entro la soglia dei 15ms) isolate da guasti comuni (alimentazione, allagamenti) ma connesse in fibra ottica dedicata (Dark fiber) per apparire come un'unica grande infrastruttura logica.
+\end{itemize}
+
+\subsection{Application Resiliency: Progettare per il Fallimento}
+Le moderne architetture cloud si arrendono all'evidenza statistica che l'hardware fallirà inevitabilmente. La resilienza viene quindi astratta e spostata totalmente a livello software (\textbf{Design for Failure}):
+\begin{itemize}
+    \item \textbf{Statelessness e Persistent State:} I container e i web server non devono \textit{mai} salvare dati locali. Lo stato persistente viene scaricato costantemente su database esterni o Object Storage (es. S3), permettendo a Kubernetes di "uccidere" e ricreare un nodo applicativo infetto o guasto in 1 secondo, senza perdite e senza causare interruzioni agli utenti.
+    \item \textbf{Graceful Degradation:} Se il sofisticato servizio di raccomandazione AI di Netflix fallisce nel cloud, l'interfaccia utente non deve generare una pagina di errore 500. Deve degradare l'esperienza in modo "elegante", servendo automaticamente una banale lista statica generica precompilata di film.
+    \item \textbf{Retry Logic e Circuit Breaker:} Le chiamate API asincrone tra microservizi cloud falliranno per timeout di rete o latenza. Si implementano pattern software per ritentare (\textit{Exponential Backoff}) o "aprire il circuito" (\textit{Circuit Breaker}), disabilitando del tutto la chiamata problematica per evitare di bombardare e definitivamente abbattere un microservizio già congestionato.
+    \item \textbf{Event-Driven Architecture:} Disaccoppiamento tramite code asincrone (es. Kafka o RabbitMQ). Se un database è temporaneamente sovraccarico per un picco di traffico imprevedibile, le scritture in arrivo si accumulano pazientemente in coda invece di fallire, venendo smaltite non appena il database torna a respirare.
 \end{itemize}
 
 \section{Sicurezza (Security)}

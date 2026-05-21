@@ -80,6 +80,16 @@ PUE = \frac{\text{Total Facility Power}}{\text{IT Equipment Power}}
 \]
 Più il PUE si avvicina a 1, maggiore è l'efficienza (significa che non si sta sprecando energia per raffreddare). I migliori data center odierni hanno un PUE annuo attorno a 1.15 - 1.20.
 
+\begin{warningbox}[Le Trappole del PUE]
+Sebbene il PUE sia lo standard de facto, presenta diverse ambiguità critiche che possono trarre in inganno:
+\begin{itemize}
+    \item \textbf{Impatto della Stagionalità:} Il PUE non è un valore fisso. Un datacenter che sfrutta il raffreddamento ad aria esterna (Free Cooling) misurerà un PUE eccellente (es. 1.05) in inverno, ma vedrà crollare l'efficienza (es. 1.50) in estate a causa dell'attivazione forzata dei compressori meccanici.
+    \item \textbf{Il Paradosso del Datacenter Vuoto:} Un data center appena inaugurato con pochissimi server accesi (IT Power molto basso) avrà paradossalmente un PUE pessimo. Questo perché i sistemi di raffreddamento industriali (chiller, pompe) hanno un consumo di base ineliminabile anche girando al minimo, sbilanciando la frazione matematica.
+    \item \textbf{Valutazione Economica (Split Domestici):} Per raffreddare un piccolo locale CED, installare un impianto industriale (PUE 1.3) costerebbe decine di migliaia di euro e richiederebbe contratti di manutenzione costosi. Spesso si scelgono semplici condizionatori domestici "split": portano il PUE a un disastroso 2.0, ma risultano economicamente la scelta più sensata in termini di investimento iniziale e affidabilità pratica.
+\end{itemize}
+\end{warningbox}
+
+
 \section{Sicurezza e Continuità}
 La progettazione logica segue la cosiddetta \textbf{CIA Triad}:
 \begin{itemize}

@@ -26,6 +26,14 @@ A differenza della DRAM, la memoria NAND Flash presenta un'asimmetria intrinseca
     \item \textbf{MLC, TLC, QLC:} rispettivamente 2, 3 e 4 bit per cella. Costi decrescenti ma resistenza (endurance) e prestazioni in scrittura in rapido calo.
 \end{itemize}
 
+\begin{warningbox}[Ritenzione dei Dati e Over-provisioning]
+Due problemi ingegneristici critici affliggono gli SSD moderni:
+\begin{enumerate}
+    \item \textbf{Longevità (Data Retention):} Per prevenire la dissipazione naturale della carica elettronica intrappolata nelle celle, il controller dell'SSD è costretto a leggere e riscrivere "silenziosamente" in background i propri blocchi NAND ogni $\sim$2 settimane. Senza alimentazione prolungata (es. nel Cold Storage), i dati su SSD evaporano.
+    \item \textbf{Over-provisioning:} Un SSD non può sovrascrivere direttamente un blocco contenente dati parziali; deve leggere, cancellare interamente il blocco e riscrivere (Write Amplification). Se un SSD supera il 90\% di riempimento, lo spazio libero per queste manovre (\textit{Garbage Collection}) si esaurisce, causando un crollo drastico e subitaneo delle performance. Per evitarlo, si ricorre al pre-conditioning e all'Over-provisioning hardware (allocando in fabbrica un 10-20\% di spazio flash aggiuntivo invisibile al sistema operativo).
+\end{enumerate}
+\end{warningbox}
+
 \subsection{Misure di Performance: IOPS, Latenza e Bandwidth}
 Latenza e Bandwidth (throughput) da sole non sono sufficienti per caratterizzare le prestazioni di uno storage, poiché dipendono fortemente dal pattern di accesso (sequenziale o casuale). 
 Una metrica fondamentale è l'\textbf{IOPS} (Input/Output Operations Per Second), ovvero il numero di operazioni di I/O completate in un secondo.
@@ -35,23 +43,28 @@ Una metrica fondamentale è l'\textbf{IOPS} (Input/Output Operations Per Second)
     \item Grazie alla natura asincrona dello storage, protocolli come NVMe (che supportano fino a 64.000 code parallele) permettono di scalare immensamente il throughput elaborando molte richieste simultaneamente.
 \end{itemize}
 
-\section{Aggregazione e Protezione: Il RAID}
-Un singolo disco è un single point of failure inaccettabile. Si utilizza quindi il \textbf{RAID} (Redundant Array of Inexpensive Disks):
+\section{Aggregazione e Protezione: RAID e Resilienza}
+Un singolo disco è un single point of failure inaccettabile. Si utilizza quindi il \textbf{RAID} (Redundant Array of Independent Disks):
 \begin{itemize}
     \item \textbf{RAID 0 (Striping):} Nessuna ridondanza, altissime prestazioni, rischio massimo.
-    \item \textbf{RAID 1 (Mirroring):} Copia identica, perde il 50\% dello spazio.
-    \item \textbf{RAID 5:} Ridondanza calcolata tramite funzione logica \textbf{XOR}. Tolleranza alla rottura di 1 solo disco. Se un secondo disco si rompe durante la fase di \textit{rebuild}, si perdono tutti i dati.
-    \item \textbf{RAID 6:} Usa doppia parità, permettendo il fallimento simultaneo di \textbf{2 dischi}. È lo standard de facto nei datacenter odierni per via delle grandi capacità dei drive e dei lunghi tempi di rebuild.
+    \item \textbf{RAID 1 (Mirroring):} Copia identica (Mirrored LUN), perde il 50\% dello spazio ma garantisce disponibilità istantanea in caso di guasto.
+    \item \textbf{RAID 5:} Ridondanza calcolata tramite funzione logica \textbf{XOR}. Tolleranza alla rottura di 1 solo disco. Se un secondo disco si rompe durante la delicata fase di \textit{rebuild} (che può durare giorni sui moderni dischi capienti), si perdono tutti i dati.
+    \item \textbf{RAID 6:} Usa doppia parità, permettendo il fallimento simultaneo di \textbf{2 dischi}.
 \end{itemize}
+
+\textbf{Il Tramonto del RAID Hardware e l'Erasure Coding}\\
+L'avvento degli SSD NVMe (con throughput di decine di GB/s) ha reso paradossalmente obsoleti i costosi \textit{Controller RAID Hardware}. Il chip del controller non riesce a star dietro matematicamente alla velocità di calcolo della parità necessaria per dischi così veloci, diventando il nuovo collo di bottiglia. Oggi domina il \textbf{Software RAID} (es. \texttt{mdadm} su Linux o file system come ZFS), che delega il calcolo delle parità alle potentissime CPU host multicore.
+
+Nei sistemi cloud distribuiti su vasta scala (come l'Object Storage), il RAID classico fallisce. Viene sostituito dall'\textbf{Erasure Coding (n=m+k)}: un file viene spezzato in $m$ frammenti dati, ai quali si aggiungono $k$ frammenti di parità calcolati matematicamente. I frammenti vengono dispersi su decine di server in rack diversi. È possibile ricostruire il file intero avendo a disposizione \textit{qualsiasi} $m$ frammenti. Questo offre maggiore resilienza del RAID a un costo di archiviazione inferiore, ma con un overhead di calcolo CPU maggiore.
 
 \section{Architetture di Storage nel Datacenter}
 
 \subsection{SAN (Storage Area Network)}
 La SAN centralizza lo storage separandolo dai server, comunicando a livello di blocco (espone dischi grezzi, non file). I protocolli dominanti per questo fabric sono:
 \begin{itemize}
-    \item \textbf{Fibre Channel (FC):} Una rete fisicamente e logicamente separata dall'Ethernet standard. Richiede schede dedicate sui server, dette \textbf{HBA (Host Bus Adapter)}, e switch FC dedicati. Identifica i nodi non tramite MAC address, ma tramite indirizzi a 64 bit chiamati \textbf{WWN (World Wide Name)}.
+    \item \textbf{Fibre Channel (FC):} Standard legacy predominante prima dell'era NVMe, si basa sul protocollo \textbf{SCSI} per la movimentazione dei blocchi. È una rete fisicamente e logicamente separata dall'Ethernet standard, spesso costruita con topologia a doppio fabric fisicamente ridondato (Fabric A e Fabric B). Richiede schede dedicate sui server, dette \textbf{HBA (Host Bus Adapter)}. Identifica i nodi non tramite MAC address, ma tramite indirizzi a 64 bit chiamati \textbf{WWN (World Wide Name)}.
     \item \textbf{iSCSI:} Alternativa economica che trasporta i comandi SCSI all'interno di normali pacchetti TCP/IP su rete Ethernet. Funziona tramite un'architettura client-server: il server host agisce da \textbf{iSCSI Initiator} (che richiede i blocchi), mentre lo storage array è l'\textbf{iSCSI Target} (che li fornisce). I nodi sono identificati tramite stringhe \textbf{IQN}.
-    \item \textbf{FCoE (Fibre Channel over Ethernet):} Il tentativo di unificare le due reti. Incapsula i frame FC direttamente dentro l'Ethernet standard, eliminando la necessità di stendere cavi in fibra separati e riducendo il numero di switch, ma mantenendo il protocollo FC senza l'overhead del TCP/IP.
+    \item \textbf{FCoE (Fibre Channel over Ethernet):} Il tentativo storico di unificare le due reti. Incapsula i frame FC (SCSI) direttamente dentro l'Ethernet standard (Lossless Ethernet usando protocolli DCB/PFC), eliminando la necessità di cablaggio separato, senza l'overhead del TCP/IP. Oggi superato quasi totalmente da \textbf{NVMe-over-Fabrics (NVMe-oF)}.
 \end{itemize}
 
 \begin{tipbox}[Sicurezza SAN: Zoning e Masking]
@@ -66,7 +79,7 @@ Per evitare che un server formatti per errore il disco (o intercetti i dati) di 
 Il NAS opera a un livello di astrazione più alto, connesso tramite rete Ethernet standard (protocolli NFS o SMB).
 \begin{itemize}
     \item \textbf{Astrazione:} Espone un File System logico (\textit{file e directory}).
-    \item \textbf{Limiti:} Maggiore latenza e impossibilità di usare la tecnica del \textit{memory mapping} in rete.
+    \item \textbf{Limiti e mmap:} Maggiore latenza di rete. In particolare, il NAS distrugge le performance applicative in caso di uso massivo della direttiva \textbf{memory mapping (mmap)} per accesso casuale (es. database o file virtual disk VM). Il \textit{mmap} mappa un file logico del disco direttamente nello spazio RAM di un processo (Page Cache). Se il file risiede in remoto su un NAS, ogni singolo \textit{page fault} (lettura di un frammento mancante in RAM) scatena sincronicamente un intero bloccante round-trip di rete Ethernet, mascherando un disastroso ritardo di I/O dietro una semplice istruzione di memoria, portando a stalli (\textit{stall}) applicativi. Questo problema non si verifica con lo storage a blocchi SAN (DMA diretto).
     \item \textbf{Casi d'uso:} File sharing, backup, documenti aziendali.
 \end{itemize}
 
@@ -93,11 +106,21 @@ I Vector Database sono il motore dell'architettura \textbf{RAG}, tecnica essenzi
 
 \section{Servizi Avanzati e Resilienza}
 
+\subsection{Efficienza: Deduplicazione, Compressione e Tiering}
+Oltre a conservare blocchi, i controller storage moderni (NAS/SAN) offrono servizi a valore aggiunto (spesso \textit{in-line}, calcolati in tempo reale durante la scrittura tramite chip ASIC dedicati):
+\begin{itemize}
+    \item \textbf{Deduplicazione:} Identifica e rimuove blocchi di dati fisicamente identici (es. se ci sono 100 macchine virtuali Windows con lo stesso file di sistema operativo, il dato viene salvato una volta sola sul disco). Un contatore referenziale logico tiene traccia delle copie per gli host.
+    \item \textbf{Compressione:} Riduzione matematica dell'impronta dei dati sul disco.
+    \item \textbf{Caching e Auto-Tiering:} Promozione automatica dei blocchi di dati più letti/scritti ("hot data") da dischi lenti a tier molto veloci (es. RAM NVRAM o SSD NVMe) in modo del tutto trasparente all'applicazione.
+    \item \textbf{Multipath I/O:} A livello server, ogni HBA viene collegato a fabric di rete paralleli (es. switch A e B) per avere percorsi logici simultanei verso la medesima LUN dello storage array, garantendo load-balancing e failover istantaneo (MPIO).
+\end{itemize}
+
 \subsection{Snapshot, Thin Provisioning e Replica}
 \begin{itemize}
-    \item \textbf{Thin Provisioning:} Permette di allocare logicamente più spazio agli utenti rispetto a quanto fisicamente presente nello storage, basandosi sul principio che raramente lo spazio allocato viene subito riempito (\textit{Overcommitment}). Il rischio intrinseco è esaurire fisicamente lo spazio se tutti gli utenti scrivono contemporaneamente, causando un blocco sistemico dei dischi.
-    \item \textbf{Snapshot vs Clone:} La \textit{Snapshot} è una fotografia istantanea del volume che occupa inizialmente zero spazio aggiuntivo. Sfrutta il meccanismo del \textbf{Copy-on-Write (COW)}: congela i blocchi originali e alloca nuovi blocchi solo per le successive scritture. Se i dati originali si rompono, la snapshot è inservibile perché basata su puntatori condivisi. Un \textbf{Clone}, invece, è una copia fisica completa bit-a-bit (che impiega tempo e spazio) ed è totalmente indipendente.
-    \item \textbf{Replica Sincrona/Asincrona:} Indispensabile per il Disaster Recovery. Nel caso di siti geografici vicini (max 300 km o 15ms di latenza round-trip), è possibile realizzare \textbf{Metro Cluster} con replica sincrona active-active.
+    \item \textbf{Thin Provisioning:} Permette di allocare logicamente agli utenti più spazio di quanto fisicamente presente nello array, basandosi sul principio che lo spazio allocato viene riempito raramente (\textit{Overbooking}). Il rischio fatale è esaurire fisicamente lo spazio libero se tutti scrivono, causando un blocco panico sistemico di tutto il datacenter (nessuno può più scrivere su disco).
+    \item \textbf{Snapshot vs Clone:} La \textit{Snapshot} è una fotografia istantanea del volume a costo zero in termini di spazio. Sfrutta il meccanismo \textbf{Copy-on-Write (COW)}: congela i blocchi originali e alloca nuovi blocchi (file differenziali) solo per le successive modifiche. \textbf{Impatto sulle performance:} un'alta catena di snapshot attive degrada fortemente le prestazioni I/O in lettura. Un \textbf{Clone} è invece una copia fisica completa bit-a-bit (comporta consumo di spazio e tempo).
+    \item \textbf{Crash-consistent vs Application-consistent:} Una snapshot di base è sempre \textit{crash-consistent} (equivalente allo staccare brutalmente la spina, senza flush delle cache in RAM), il che corrompe inesorabilmente i database. Per prevenirlo, l'infrastruttura utilizza agenti come \textbf{Windows VSS (Volume Shadow Copy Service)} che si coordinano con il SO per "congelare" un attimo l'I/O applicativo (\textit{quiesce}), scattare la snapshot e riprendere in modo \textit{application-consistent}.
+    \item \textbf{Replica Sincrona/Asincrona:} Indispensabile per il Disaster Recovery. Nel caso di siti geografici vicini (entro 15ms latenza), si usano \textbf{Metro Cluster} con replica sincrona active-active.
 \end{itemize}
 
 \subsection{Backup vs Replica}

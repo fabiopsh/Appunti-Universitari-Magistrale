@@ -4,7 +4,9 @@
 La rete è il sistema vascolare del datacenter. L'evoluzione della densità di traffico ha segnato il progressivo abbandono del rame a favore della fibra ottica.
 
 \subsection{Cavi in Rame ed Ethernet}
-Storicamente, i data center si basavano pesantemente sul rame (es. i vecchi cavi \textbf{Cat 5} o Cat 5e che limitavano le velocità a 100 Mbps o 1 Gbps). I limiti fisici del rame (diafonia e attenuazione del segnale) e la necessità di gestire un preciso \textit{pin-out} per l'allineamento dei contatti hanno reso sempre più complessa l'evoluzione. 
+Storicamente, le reti informatiche affrontavano il problema delle collisioni sui cavi condivisi. Una topologia diffusa era il \textbf{Token Ring (IEEE 802.5)}, una rete ad anello fisico in cui un "gettone" elettronico veniva passato tra i computer: solo chi possedeva il gettone poteva trasmettere. Sebbene garantisse una latenza prevedibile, la rottura di un singolo cavo o nodo paralizzava l'intero anello. Ethernet ha vinto la battaglia commerciale grazie alla topologia a stella e al protocollo CSMA/CD, molto più robusto e flessibile ma prono a inefficienze e collisioni ad alto carico prima dell'introduzione dello switching.
+
+Sui cablaggi, i data center si basavano pesantemente sul rame (es. i vecchi cavi \textbf{Cat 5} o Cat 5e che limitavano le velocità a 100 Mbps o 1 Gbps). I limiti fisici del rame (diafonia e attenuazione del segnale) e la necessità di gestire un preciso \textit{pin-out} per l'allineamento dei contatti hanno reso sempre più complessa l'evoluzione. 
 Oggi, il tradizionale cavo in rame (standard Ethernet con connettore RJ45) è confinato al limite pratico dei \textbf{10 Gbps (Cat 6A)}. Andare oltre con standard come Cat 7 o Cat 8 risulta impraticabile: i cavi diventano spessi, rigidi e difficili da gestire (il cosiddetto \textit{cable management} è vitale, poiché un cablaggio disordinato blocca il flusso d'aria e distrugge l'efficienza termica del rack).
 
 \subsection{Fibra Ottica e Transceiver}
@@ -41,16 +43,35 @@ In passato, l'architettura di rete dominante si basava su enormi \textit{chassis
     \caption{Modello SDN: l'intelligenza di rete viene astratta dall'infrastruttura fisica sottostante.}
 \end{figure}
 La grande rivoluzione è stata la separazione concettuale in due piani:
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/sdn_control_plane.png}
+    \caption{Dettaglio architetturale della separazione tra ASIC (Data Plane) e CPU x86 (Control Plane).}
+\end{figure}
 \begin{enumerate}
-    \item \textbf{Data Plane (Piano Dati):} hardware dedicato (spesso ASIC commodity, es. chip Broadcom) che si occupa di inoltrare pacchetti (\textit{forwarding}) a velocità \textit{line-rate}. Gli switch moderni sono \textit{non-blocking}, ovvero capaci di inoltrare traffico su tutte le porte simultaneamente senza colli di bottiglia.
-    \item \textbf{Control Plane (Piano di Controllo):} un vero e proprio computer (spesso con CPU x86 e sistema operativo Linux) che gestisce la logica di rete (routing come BGP, policy, ecc.).
+    \item \textbf{Data Plane (Piano Dati):} hardware dedicato (spesso ASIC commodity, es. chip Broadcom) che inoltra i pacchetti (\textit{forwarding}) in modo non-bloccante a velocità \textit{line-rate}. L'introduzione di un frame in questo ASIC hardware aggiunge una latenza irrisoria di circa \textbf{600 ns}.
+    \item \textbf{Control Plane (Piano di Controllo):} un vero e proprio PC (spesso basato su processori \textbf{Intel Celeron} o similari) integrato nello chassis, che gestisce la logica di rete (BGP, OSPF). Essendo un PC Linux completo, è possibile compilarci software sopra (es. eseguire l'editor VSCode direttamente dentro lo switch per editare script).
 \end{enumerate}
+
+\begin{warningbox}[Running vs Startup Config]
+Nei sistemi operativi di rete è vitale la gestione della memoria del Control Plane. Le modifiche ai parametri (es. via CLI) avvengono nella \textbf{Running Configuration} (sita nella RAM volatile); hanno effetto immediato ma spariscono in caso di spegnimento o blackout. Per renderle definitive devono essere salvate nella \textbf{Startup Configuration} (memoria flash/NVRAM) tramite il comando \texttt{write} (o \texttt{copy running-config startup-config}). Molti disservizi catastrofici (e impossibili da debuggare a posteriori) nascono da riavvii improvvisi di apparati le cui configurazioni non erano mai state persistite su disco.
+\end{warningbox}
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.7\textwidth]{images/sonic.png}
     \caption{Architettura SONiC: ogni funzione di rete gira nel proprio container Docker comunicando tramite Redis.}
 \end{figure}
 La disaggregazione hardware-software ha portato alla nascita di Sistemi Operativi di Rete (NOS) open source come \textbf{SONiC} (Software for Open Networking in the Cloud, creato da Microsoft). Avviato tramite il bootloader ONIE, SONiC tratta lo switch come un server standard, eseguendo ogni demone di routing all'interno di \textit{container Docker} isolati.
+
+\subsubsection{L'API OpenFlow e il Firewall Sandwich}
+Per istruire il Data Plane su come inoltrare i pacchetti, il Control Plane (o un controller centralizzato) utilizza protocolli di comunicazione, il più famoso dei quali è l'\textbf{API OpenFlow}. Questo permette di manipolare programmaticamente le \textit{Flow Tables} all'interno dell'ASIC.
+Grazie a questa astrazione, si realizzano architetture come il \textbf{Firewall Sandwich}: il controller SDN (OpenFlow) istruisce lo switch per deviare tutto il traffico in ingresso verso una serie di firewall hardware posti in parallelo (il "ripieno" del sandwich). Una volta ispezionato, il traffico rientra nello switch che lo instrada alla destinazione finale, bilanciando il carico e garantendo scalabilità lineare della sicurezza, in modo trasparente.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{images/openflow_sandwich.png}
+    \caption{Architettura Firewall Sandwich governata tramite SDN e OpenFlow.}
+\end{figure}
 
 \section{Topologie di Rete: Dal 3-Tier allo Spine-and-Leaf}
 Storicamente, i datacenter adottavano una topologia \textbf{3-tier} (Access, Distribution, Core), ottimizzata per il traffico \textbf{Nord-Sud} (client-server). 
@@ -79,6 +100,11 @@ L'architettura si sviluppa su due livelli fisici rigorosi:
 \end{tipbox}
 
 \section{Segmentazione e Virtualizzazione della Rete}
+
+\subsection{Jumbo Frames e MTU}
+Prima di frammentare logicamente la rete, è fondamentale definirne il payload massimo. L'\textbf{MTU (Maximum Transmission Unit)} standard in Ethernet è di 1500 byte. Tuttavia, in ambienti datacenter (specialmente per il traffico storage), segmentare file enormi in blocchi da 1.5 KB causa un overhead insostenibile di CPU per elaborare milioni di header. Si abilitano quindi i \textbf{Jumbo Frames}, portando l'MTU a \textbf{9000 byte (9 KB)}.
+La trappola operativa è la frammentazione: l'MTU deve essere configurato in modo rigorosamente identico su ogni singolo switch e server lungo il percorso, pena la caduta drastica delle performance o la perdita silenziosa dei pacchetti (\textit{black holing}).
+
 \subsection{VLAN (Virtual LAN)}
 L'header Ethernet classico contiene un indirizzo MAC di destinazione (6 byte), un MAC sorgente (6 byte) e un campo EtherType (2 byte). Le VLAN (standard IEEE 802.1Q) permettono di suddividere una rete fisica in più domini di broadcast logici, inserendo un tag di 4 byte subito dopo il MAC sorgente. 
 Questo tag 802.1Q include un campo TPID (che indica la presenza della VLAN) e un TCI, il quale a sua volta contiene 3 bit per la priorità (QoS) e \textbf{12 bit per l'identificativo VLAN (VID)}. Essendo l'ID VLAN lungo esattamente 12 bit, il limite teorico invalicabile è di \textbf{4094 reti} utilizzabili ($2^{12}-2$), un numero assolutamente insufficiente per i moderni cloud provider multi-tenant che devono ospitare centinaia di migliaia di reti isolate.
@@ -88,7 +114,7 @@ Per superare la rigidità architetturale e il limite di 4096 reti delle VLAN tra
 Questo innalza il limite a \textbf{16 milioni di reti virtuali isolate} (grazie a un identificativo VNI a 24 bit) e permette di creare domini di broadcast Layer 2 arbitrari su un'infrastruttura fisica di routing Layer 3. Ciò significa che due macchine virtuali possono credere di essere collegate allo stesso switch fisico (stessa subnet L2), anche se si trovano in due rack fisicamente distanti instradati in L3.
 
 \section{Fabric ad Alte Prestazioni (HPC e AI)}
-In contesti HPC e di addestramento AI, dove la computazione è pesantemente distribuita e sincronizzata, la latenza introdotta dallo stack TCP/IP Ethernet (tipicamente $\sim$70 $\mu$s) è inaccettabile.
+In contesti HPC e di addestramento AI, l'overhead software diventa il nemico primario. Come visto, un frame attraversa l'hardware dello switch (il cut-through ASIC) in circa \textbf{600 ns}. Tuttavia, solo per far attraversare al dato lo stack software del protocollo TCP/IP all'interno del sistema operativo del server (gestione interrupt, allocazione buffer), si introducono circa \textbf{70 $\mu$s} di latenza (oltre 100 volte il tempo di switching), un valore che l'inventore del TCP Vint Cerf aveva associato al problema del \textit{bufferbloat} (l'accumulo distruttivo di pacchetti nei buffer intermedi).
 
 In questi scenari domina \textbf{InfiniBand}, una rete che offre latenze di 1-3 $\mu$s. Il segreto è l'implementazione del protocollo \textbf{RDMA (Remote Direct Memory Access)}, che permette a un server di scrivere direttamente nella memoria RAM di un altro server scavalcando completamente l'intervento della CPU e del sistema operativo ricevente.
 Oggi, RDMA è disponibile anche su reti Ethernet avanzate tramite il protocollo \textbf{RoCE} (RDMA over Converged Ethernet).

@@ -17,6 +17,12 @@ Arrivati al limite fisico del calore dissipabile (Power Wall), si è passati al 
 
 \textbf{Hyperthreading e SMT (Simultaneous Multithreading)}\\
 Per ridurre al minimo i tempi morti (idle time) in cui un core attende dati dalla memoria, i progettisti hanno introdotto l'\textbf{Hyperthreading} (o SMT). Il trucco consiste nel duplicare solo le risorse "leggere" (come i registri e il program counter), mantenendo condivise le costose unità di calcolo fisico (ALU). Il sistema operativo vede \textbf{due core logici} per ogni core fisico: quando un thread è in stallo per un \textit{cache miss}, il core scambia istantaneamente contesto ed esegue le istruzioni dell'altro thread.
+Sebbene eccellente per server web e database ad alto I/O, l'HT è \textbf{dannoso in ambito HPC} (High Performance Computing): se due thread devono fare calcolo intensivo matematico simultaneo, lotteranno aspramente per l'unica ALU condivisa, riducendo le performance generali. Nei supercomputer l'HT viene perciò disabilitato.
+
+\begin{tipbox}[Overbooking e Memory Ballooning]
+La virtualizzazione si fonda sull'\textbf{Overbooking} (sovra-allocazione logica delle risorse fisiche sottostanti). Oltre all'ovvio over-commit delle vCPU, si esegue overbooking pesante sulla RAM. Un meccanismo chiave è il \textbf{Memory Ballooning}: l'hypervisor inietta un driver-palloncino nel kernel del SO ospite. Se il server fisico sta esaurendo la vera RAM, l'hypervisor "gonfia" il palloncino. Il SO ospite crede di aver bisogno urgentemente di memoria interna, swappa i propri processi meno usati sul suo disco virtuale e restituisce la RAM vera al palloncino (e quindi all'hypervisor). L'hypervisor maschera inoltre enormi quantità di RAM tramite \textit{Memory Page Sharing} (es. KSM deduplica le pagine di sistema operativo identiche tra decine di VM Windows uguali).
+\end{tipbox}
+
 \begin{warningbox}[Vulnerabilità Side-Channel]
 Condividere fisicamente la cache L1 e i buffer di esecuzione tra due thread apre la porta ad attacchi speculativi come \textbf{Spectre} o \textit{MDS}. Un thread malevolo può dedurre dati segreti del thread "fratello" misurando la latenza della cache. Per massima sicurezza, alcuni cloud provider disabilitano del tutto l'SMT.
 \end{warningbox}
@@ -29,7 +35,7 @@ Condividere fisicamente la cache L1 e i buffer di esecuzione tra due thread apre
 \textbf{Interconnessione interna: Crossbar vs Bus}\\
 A livello di interconnessione interna (die), le prime CPU multi-core usavano un \textit{Bus Condiviso}, che diventava subito un collo di bottiglia: solo un core alla volta poteva parlare. Oggi si utilizza la \textbf{Crossbar} (o una \textit{Mesh Network}): una matrice di interconnessione che permette a molteplici core di comunicare simultaneamente con banchi di memoria o I/O diversi senza intralciarsi, garantendo \textit{bisection bandwidth} completa.
 
-Questo approccio reticolare si sposa perfettamente con l'architettura a \textbf{Tile (o Chiplet)}: i processori moderni non sono più un unico monolite di silicio prono a difetti, ma un mosaico di piccoli chip iperspecializzati (Compute Tile, I/O Tile) stampati con nodi differenti e incollati sullo stesso package, migliorando enormemente le rese produttive (yield) e abbassando i costi.
+Questo approccio reticolare si sposa perfettamente con l'architettura a \textbf{Tile (o Chiplet)}: i processori moderni non sono più un unico monolite di silicio prono a difetti, ma un mosaico di piccoli chip iperspecializzati (Compute Tile, I/O Tile) stampati con nodi differenti e incollati sullo stesso package, migliorando enormemente le rese produttive (yield) e abbassando i costi. Esempi concreti di questo approccio sono il fabric di interconnessione \textbf{AMD Infinity Fabric} per unire i chiplet nei processori EPYC, e le tecnologie di packaging avanzato 3D come \textbf{Intel EMIB e Foveros} (usate nelle architetture Meteor Lake e Sapphire Rapids) che impilano i die di silicio verticalmente.
 
 \subsection{GPU e NPU: Il cambio di paradigma}
 \begin{itemize}
@@ -95,8 +101,9 @@ La macchina virtuale non vede la reale CPU fisica, ma una \textbf{vCPU} (Virtual
 Inoltre, siccome l'intero ambiente Guest è solo software in esecuzione su un ciclo \textit{fetch-execute} controllato, l'hypervisor gode del potere di \textbf{Pause and Resume}. Può congelare istantaneamente il sistema operativo salvando \textit{lo stato completo della VM} (registri della CPU, stato della memoria e disco virtuale). Il SO virtualizzato non si accorgerà di nulla, per lui il tempo si sarà semplicemente fermato. 
 Tramite gli \textbf{Integration Services}, l'hypervisor forza poi la sincronizzazione del clock alla ripresa (vitale per protocolli come Kerberos che falliscono se l'orario si disallinea), invia segnali di \textit{heartbeat} per capire se il kernel Guest è crashato, e orchestra spegnimenti puliti (graceful shutdown).
 
-\begin{tipbox}[Windows e il Secure World]
-Oggi la virtualizzazione è pervasiva anche sui dispositivi client. All'avvio, Windows moderno lancia in realtà due sistemi operativi. Il primo è un micro-OS nascosto (\textbf{Secure World}) che isola l'hardware crittografico (es. chiavi BitLocker). Subito dopo viene lanciato l'ambiente Windows utente, che ci gira accanto \textit{virtualizzato}. In questo modo, anche se un hacker ottiene i privilegi massimi (Ring 0) sul kernel di Windows, non potrà mai rubare le chiavi crittografiche, protette dall'invalicabile isolamento dell'hypervisor.
+\begin{tipbox}[Windows Dual Boot e Secure World con WSL2]
+Oggi la virtualizzazione è pervasiva anche sui dispositivi client. All'avvio, un PC con Windows moderno (VBS abilitato) non fa un normale avvio nudo, ma lancia un hypervisor (Hyper-V) che istanzia due ambienti. Il primo è un micro-OS nascosto (\textbf{Secure World}) che isola l'hardware crittografico (es. chiavi BitLocker). Subito dopo viene lanciato l'ambiente Windows desktop principale, che gira quindi \textit{virtualizzato}. Anche se un hacker ottiene i privilegi massimi (Ring 0) sul kernel di Windows, non potrà mai rubare le chiavi crittografiche del Secure World.
+Lo stesso hypervisor client trasparente rende possibile \textbf{WSL2} (Windows Subsystem for Linux), che esegue un vero kernel Linux completo in una micro-VM ultraleggera parallelamente a Windows.
 \end{tipbox}
 
 \subsection{Il Virtual Switch (vSwitch)}
@@ -104,21 +111,40 @@ Per connettere le VM al mondo esterno, l'Hypervisor implementa un \textbf{Virtua
 
 \subsection{Live Migration}
 La funzionalità più dirompente della virtualizzazione è la \textbf{Live Migration} (es. VMware vMotion), che permette di spostare una VM accesa da un host fisico a un altro senza interruzione di servizio.
-Si sviluppa in due fasi:
+Si sviluppa rigorosamente in tre fasi sequenziali:
 \begin{enumerate}
-    \item \textbf{Pre-copy (Dirty tracking):} Trasferimento massivo della memoria mentre la VM gira, tracciando continuamente quali pagine vengono modificate nel frattempo.
-    \item \textbf{Stop and copy:} Una volta ridotto il set di dati "sporchi", la VM viene "congelata" per pochi millisecondi, viene copiato lo stato residuo dei registri e l'esecuzione riparte sul nuovo host fisico. Un \textit{Gratuitous ARP} informa gli switch fisici di reindirizzare il traffico verso la nuova destinazione.
+    \item \textbf{Pre-copy (Dirty tracking):} Trasferimento massivo iniziale della memoria mentre la VM gira sul vecchio host. Il sistema traccia attivamente tramite una bitmap (\textit{dirty page tracking}) quali pagine di memoria vengono modificate durante la lenta operazione di copia in rete. Questo ciclo viene ripetuto per trasferire i delta successivi.
+    \item \textbf{Stop and copy:} Quando le dirty pages rimaste sono pochissime, la VM viene "congelata" (pausa impercettibile di pochi ms). Viene copiato lo stato residuo dei registri CPU, i buffer di I/O, e la RAM residua. L'esecuzione viene trasferita all'hypervisor di destinazione.
+    \item \textbf{Gestione della Rete (Gratuitous ARP):} Poiché il MAC address della VM si è spostato fisicamente su un'altra porta dello switch core del datacenter, il vSwitch di destinazione lancia un \textbf{Gratuitous ARP} broadcast. Questo aggiorna istantaneamente le tabelle CAM di tutti gli switch fisici, garantendo che i pacchetti in transito non vengano persi.
 \end{enumerate}
 
 \section{Containerizzazione}
-A differenza della virtualizzazione, i \textbf{Container} non emulano un hardware o un intero kernel, ma \textbf{condividono il kernel Linux dell'host}. L'isolamento, vitale per impedire che i container collassino tra loro o consumino tutte le risorse, è gestito nativamente dal sistema operativo tramite due primitive fondamentali:
+A differenza della virtualizzazione, i \textbf{Container} non emulano un intero hardware o un intero kernel, ma \textbf{condividono il kernel Linux dell'host}. Questo riduce a zero l'overhead, ma cambia radicalmente le modalità di sicurezza e funzionamento in rete.
+
+\subsection{Meccanismi di Isolamento e Vulnerabilità}
+L'isolamento, vitale per impedire che i container collassino tra loro, è delegato al kernel del sistema operativo tramite due primitive:
 \begin{itemize}
-    \item \textbf{Namespaces:} Isolano la visibilità logica. Un namespace fa credere al container di essere l'unico sistema in esecuzione, dotandolo di un proprio albero dei processi (PID namespace), un proprio stack di rete isolato (IP, porte) e mount point esclusivi.
-    \item \textbf{Cgroups (Control Groups):} Limitano e misurano l'utilizzo effettivo delle risorse fisiche hardware (impongono un tetto massimo di CPU, limiti ferrei sulla quantità di RAM allocabile o sull'I/O del disco).
+    \item \textbf{Namespaces:} Isolano la visibilità logica. Un namespace fa credere al container di essere l'unico sistema, dotandolo di un PID tree autonomo e mount point esclusivi.
+    \item \textbf{Cgroups (Control Groups):} Limitano l'utilizzo hardware (impongono tetti massimi di CPU o ferrei \textit{OOM killer} per la RAM).
 \end{itemize}
 
-\begin{tipbox}[Vantaggi dei Container]
-Essendo privi di kernel, i container (come Docker) si avviano in millisecondi, hanno un \textit{overhead} irrisorio e impacchettano l'applicazione con tutte le sue dipendenze e librerie, garantendo l'esecuzione identica su qualsiasi ambiente.
-L'orchestrazione a livello datacenter dei container viene tipicamente gestita tramite piattaforme come \textbf{Kubernetes}.
-\end{tipbox}
-L'integrazione di Container e Virtualizzazione è molto comune: il cloud moderno esegue spesso cluster Kubernetes composti da nodi che sono essi stessi macchine virtuali, combinando così la leggerezza del container con l'isolamento hardware e la "mobilità" della VM.
+Condividere il kernel comporta però che una falla in esso colpisca tutti simultaneamente. Il corso cita l'anomalo caso della vulnerabilità \textbf{CVE-2026-31431 ("Copy Fail")} nel modulo \texttt{authencesn}: abusando del \textit{page cache} condiviso tra container, un banale script Python permette non solo la scalata di privilegi, ma un catastrofico \textit{container escape}, mettendo a repentaglio interi nodi di orchestrazione.
+
+\subsection{Dettagli Architetturali Docker}
+\begin{itemize}
+    \item \textbf{Overlay File System:} I container usano file system a strati (es. \textit{overlay fs}). L'immagine del container è immutabile (sola lettura). Avviandolo, si crea un leggero layer \textit{Read-Write} effimero in cima. Modificare un file base scatena una lenta \textit{Copy-on-Write} verso il layer superiore.
+    \item \textbf{Multi-stage Build:} Nello sviluppo software moderno, si usa un container gigantesco per compilare il codice sorgente. Poi, un secondo stage copia solo il binario finale compilato dentro un'immagine vuota (es. Alpine Linux da 5MB), riducendo drasticamente impronta e superficie d'attacco.
+    \item \textbf{Driver Hardware distribuiti via Container:} Perfino i driver complessi si stanno "containerizzando". NVIDIA, per facilitare i deployment AI sui nodi nudi, distribuisce l'NVIDIA Container Toolkit, incapsulando driver GPU e librerie CUDA in un container isolato anziché installarli sull'host.
+\end{itemize}
+
+\subsection{Network: VM vs Container}
+Nelle macchine virtuali, l'hypervisor crea una \textbf{vNIC} isolata (una vera scheda finta visibile alla VM) e la connette al vSwitch. 
+Nei container, questa astrazione manca. I container istanziati (se non usano bridge complessi come in K8s) \textbf{contendono direttamente l'accesso alla pNIC} (scheda fisica dell'host) tramite routing interno. Proprio per questo, i container necessitano del \textbf{Port Mapping}: la porta interna del demone (es. la 80 di NGINX) deve essere mappata e traslata tramite NAT su un'altra porta esposta del server host.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/container_vm_network.png}
+    \caption{Architettura di rete: astrazione vNIC (VM) vs contesa e NAT (Container).}
+\end{figure}
+
+L'integrazione di Container e Virtualizzazione è però lo standard: il cloud esegue spesso cluster Kubernetes composti da \textit{Worker node} che sono essi stessi macchine virtuali, combinando così la leggerezza e facilità di deployment del container con il robusto isolamento hardware (evitando container escape) della VM.
