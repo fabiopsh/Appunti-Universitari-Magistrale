@@ -26,6 +26,15 @@ A differenza della DRAM, la memoria NAND Flash presenta un'asimmetria intrinseca
     \item \textbf{MLC, TLC, QLC:} rispettivamente 2, 3 e 4 bit per cella. Costi decrescenti ma resistenza (endurance) e prestazioni in scrittura in rapido calo.
 \end{itemize}
 
+\subsection{Misure di Performance: IOPS, Latenza e Bandwidth}
+Latenza e Bandwidth (throughput) da sole non sono sufficienti per caratterizzare le prestazioni di uno storage, poiché dipendono fortemente dal pattern di accesso (sequenziale o casuale). 
+Una metrica fondamentale è l'\textbf{IOPS} (Input/Output Operations Per Second), ovvero il numero di operazioni di I/O completate in un secondo.
+\begin{itemize}
+    \item \textbf{Analogia del supermercato:} Gli IOPS rappresentano i clienti serviti al secondo, la latenza è il tempo impiegato in cassa per ogni cliente, e il parallelismo (le code) sono le casse aperte.
+    \item La relazione base per una singola coda è: $\text{IOPS} \approx \frac{1}{\text{latenza}}$.
+    \item Grazie alla natura asincrona dello storage, protocolli come NVMe (che supportano fino a 64.000 code parallele) permettono di scalare immensamente il throughput elaborando molte richieste simultaneamente.
+\end{itemize}
+
 \section{Aggregazione e Protezione: Il RAID}
 Un singolo disco è un single point of failure inaccettabile. Si utilizza quindi il \textbf{RAID} (Redundant Array of Inexpensive Disks):
 \begin{itemize}
@@ -70,6 +79,16 @@ Per decenni il mercato datacenter è stato dominato da grandi vendor che forniva
 Per abbattere i costi e scalare linearmente, si è passati all'\textbf{HCI}, che trasforma lo storage SAN centralizzato in un approccio distribuito (*Scale-out*). Ogni server (nodo commodity x86) contiene CPU, RAM e dischi NVMe locali. Un livello software (Software-Defined Storage) raggruppa tutti i dischi locali di tutti i nodi e li presenta all'hypervisor come un'unica grande SAN virtuale condivisa.
 \begin{tipbox}[Vantaggio dell'HCI]
 \textbf{Data Locality:} Il software tenta sempre di scrivere/leggere i dati di una VM nel disco fisicamente residente nello stesso server che la esegue, azzerando il traffico di rete Nord-Sud e sfruttando al massimo la banda PCIe locale.
+\end{tipbox}
+
+\subsection{Storage per l'AI: Vector Database}
+L'emergere dell'Intelligenza Artificiale generativa ha richiesto nuovi paradigmi di memorizzazione. La ricerca testuale classica era puramente \textit{sintattica} (come nel modello \textit{bag of words}), mentre i modelli neurali operano sulla \textit{semantica}.
+\begin{itemize}
+    \item \textbf{Embeddings:} Le reti neurali (LLM) trasformano testi, immagini o audio in vettori densi ad altissima dimensionalità (es. 3000 dimensioni). Questi vettori, chiamati \textit{embedding}, rappresentano il reale significato del dato in base al contesto (es. distinguono "Python" come linguaggio da "Python" come serpente).
+    \item \textbf{Vector Database:} Sono una nuova generazione di database NoSQL progettati specificamente per immagazzinare e indicizzare questi enormi vettori. Per rispondere a una query, vettorializzano la domanda dell'utente e cercano i documenti semantici più simili calcolando la \textbf{distanza coseno} nello spazio vettoriale.
+\end{itemize}
+\begin{tipbox}[RAG: Retrieval-Augmented Generation]
+I Vector Database sono il motore dell'architettura \textbf{RAG}, tecnica essenziale per limitare le "allucinazioni" delle AI. Prima di rispondere a un prompt, il sistema interroga il vector database, recupera i documenti aziendali realmente pertinenti, li inietta nel prompt e obbliga il LLM a formulare la risposta basandosi unicamente su quei fatti verificati.
 \end{tipbox}
 
 \section{Servizi Avanzati e Resilienza}

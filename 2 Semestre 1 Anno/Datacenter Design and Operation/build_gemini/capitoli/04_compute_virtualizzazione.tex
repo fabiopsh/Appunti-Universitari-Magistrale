@@ -14,14 +14,22 @@ I datacenter consumano enormi quantità di energia elettrica e acqua. Le metrich
 Storicamente, per aumentare le prestazioni, si aumentava la frequenza di clock e si ottimizzava la \textbf{Pipeline delle istruzioni} (suddivisa classicamente nelle fasi: \textit{Instruction Fetch, Decode, Execute, Memory Access, Write-back}). Aumentando la profondità della pipeline (fino a 20+ stadi), si potevano eseguire più istruzioni sovrapposte nel tempo, ma gli errori di previsione dei salti (\textit{Branch Misprediction}) causavano lo stallo e lo svuotamento completo della coda ("bolle" nella pipeline), vanificando l'efficienza. 
 
 Arrivati al limite fisico del calore dissipabile (Power Wall), si è passati al parallelismo Multi-Core. Per superare i colli di bottiglia della condivisione della RAM, le CPU moderne adottano architetture \textbf{NUMA (Non-Uniform Memory Access)}, in cui ogni processore ha un proprio banco di memoria locale ad accesso diretto rapido; l'accesso alla RAM degli altri processori avviene tramite interconnessioni esterne a latenza maggiore.
-Inoltre, per ridurre i tempi di inattività del processore si usa l'\textbf{Hyperthreading (SMT)}: vengono esposti due core logici per ogni core fisico, duplicando lo stato architettonico (registri) ma condividendo le unità di esecuzione (ALU).
+
+\textbf{Hyperthreading e SMT (Simultaneous Multithreading)}\\
+Per ridurre al minimo i tempi morti (idle time) in cui un core attende dati dalla memoria, i progettisti hanno introdotto l'\textbf{Hyperthreading} (o SMT). Il trucco consiste nel duplicare solo le risorse "leggere" (come i registri e il program counter), mantenendo condivise le costose unità di calcolo fisico (ALU). Il sistema operativo vede \textbf{due core logici} per ogni core fisico: quando un thread è in stallo per un \textit{cache miss}, il core scambia istantaneamente contesto ed esegue le istruzioni dell'altro thread.
+\begin{warningbox}[Vulnerabilità Side-Channel]
+Condividere fisicamente la cache L1 e i buffer di esecuzione tra due thread apre la porta ad attacchi speculativi come \textbf{Spectre} o \textit{MDS}. Un thread malevolo può dedurre dati segreti del thread "fratello" misurando la latenza della cache. Per massima sicurezza, alcuni cloud provider disabilitano del tutto l'SMT.
+\end{warningbox}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.6\textwidth]{images/ring_topology.png}
     \caption{Schema logico di una topologia Ring, storicamente usata per l'interconnessione interna dei core CPU.}
 \end{figure}
-A livello di interconnessione interna (die), le vecchie architetture usavano un Ring Bus. Le CPU moderne preferiscono l'approccio a \textbf{Tile (o Chiplet)} uniti da \textbf{Mesh Network} o \textbf{Crossbar Switch}, migliorando enormemente le rese produttive (yield) e limitando l'impatto dei difetti di fabbricazione del silicio.
+\textbf{Interconnessione interna: Crossbar vs Bus}\\
+A livello di interconnessione interna (die), le prime CPU multi-core usavano un \textit{Bus Condiviso}, che diventava subito un collo di bottiglia: solo un core alla volta poteva parlare. Oggi si utilizza la \textbf{Crossbar} (o una \textit{Mesh Network}): una matrice di interconnessione che permette a molteplici core di comunicare simultaneamente con banchi di memoria o I/O diversi senza intralciarsi, garantendo \textit{bisection bandwidth} completa.
+
+Questo approccio reticolare si sposa perfettamente con l'architettura a \textbf{Tile (o Chiplet)}: i processori moderni non sono più un unico monolite di silicio prono a difetti, ma un mosaico di piccoli chip iperspecializzati (Compute Tile, I/O Tile) stampati con nodi differenti e incollati sullo stesso package, migliorando enormemente le rese produttive (yield) e abbassando i costi.
 
 \subsection{GPU e NPU: Il cambio di paradigma}
 \begin{itemize}
@@ -56,6 +64,11 @@ Progettati per ottenere l'altissima densità necessaria nei cluster di virtualiz
     \caption{Server HGX (aperto): GPU ad alte prestazioni coperte da enormi dissipatori metallici per gestire il calore estremo.}
 \end{figure}
 Con l'esplosione dell'intelligenza artificiale generativa, i normali server rack non sono più sufficienti. Un server HGX è una macchina immensa (spesso 4U o 8U, pesante oltre 100 kg) progettata esclusivamente attorno alle GPU (es. NVIDIA H100). Le GPU non sono più inserite come schede PCIe estraibili, ma sono saldate direttamente su una \textit{baseboard} proprietaria e interconnesse tramite bus dedicati (come NVLink) che scavalcano il collo di bottiglia del PCIe. Generano un calore spaventoso, rendendo spesso obbligatorio il passaggio al raffreddamento a liquido (\textit{Direct-to-Chip Liquid Cooling}).
+
+\subsection{Standardizzazione Hyperscaler: Open Compute Project (OCP)}
+Creato originariamente da Meta (Facebook) nel 2011, l'\textbf{OCP (Open Compute Project)} è un consorzio no-profit che pubblica le specifiche hardware open source per server e rack da datacenter. L'idea nasce da un'esigenza economica: i server tradizionali di brand contengono molte funzionalità estetiche o di gestione (frontalini in plastica, display, alimentatori ridondati per singolo server) inutili su scala hyperscaler.
+Le specifiche OCP definiscono macchine essenziali (spesso prodotte direttamente da costruttori ODM taiwanesi come Quanta o Foxconn), permettendo risparmi enormi. Un'innovazione chiave dell'OCP è il design del rack: l'alimentazione non viene convertita in ogni singolo server, ma centralizzata a monte nel rack e distribuita ai server tramite busbar a 12V o 48V, aumentando l'efficienza energetica e la densità.
+
 \begin{tipbox}[BMC (Baseboard Management Controller) e lo Standard Redfish]
 Tutti i server di livello enterprise montano un \textbf{BMC} (es. iLO di HPE o iDRAC di Dell). Si tratta di un micro-computer indipendente inserito nella scheda madre, dotato di una porta di rete dedicata (\textit{out-of-band management}). Essendo alimentato separatamente, permette il controllo fisico del server (accensione, configurazione BIOS, console KVM virtuale) anche se il sistema operativo principale è bloccato o se il server è fisicamente spento.
 
@@ -75,6 +88,16 @@ L'architettura x86 originale non era progettata per essere virtualizzata. Preved
 In un ambiente virtualizzato, l'Hypervisor deve avere il controllo assoluto, quindi deve risiedere in Ring 0. Questo costringeva i sistemi operativi Guest a scalare in Ring 1 (modalità non privilegiata, definita \textit{Ring De-privileging}). Poiché i SO Guest non sapevano di essere virtualizzati, tentavano di eseguire istruzioni privilegiate (es. manipolazione hardware) che, fallendo, venivano intrappolate dall'Hypervisor. Quest'ultimo doveva tradurle ed emularle in tempo reale (tecnica della \textbf{Binary Translation}), causando un enorme e insostenibile overhead prestazionale.
 
 Il problema è stato risolto nel 2005 dai produttori di CPU con l'introduzione di estensioni hardware dedicate (\textbf{Intel VT-x} e \textbf{AMD-V}). Queste istruzioni hanno creato un nuovo livello di privilegio inferiore allo zero (spesso chiamato colloquialmente \textbf{Ring -1}). Oggi l'Hypervisor risiede in Ring -1, permettendo ai kernel dei sistemi operativi Guest di operare nel loro nativo Ring 0, eseguendo istruzioni in modo diretto e a velocità hardware, annullando la necessità di lenta traduzione binaria.
+
+\subsection{Astrazione dell'Hardware: vCPU, Pause e Resume}
+La macchina virtuale non vede la reale CPU fisica, ma una \textbf{vCPU} (Virtual CPU) configurata dall'hypervisor. Questo è un dettaglio cruciale per la portabilità: l'hypervisor può nascondere set di istruzioni troppo recenti (es. AVX-512) mascherando le reali capacità del processore fisico, in modo da poter migrare liberamente la VM anche verso un server più vecchio che non possiede quelle istruzioni. 
+
+Inoltre, siccome l'intero ambiente Guest è solo software in esecuzione su un ciclo \textit{fetch-execute} controllato, l'hypervisor gode del potere di \textbf{Pause and Resume}. Può congelare istantaneamente il sistema operativo salvando \textit{lo stato completo della VM} (registri della CPU, stato della memoria e disco virtuale). Il SO virtualizzato non si accorgerà di nulla, per lui il tempo si sarà semplicemente fermato. 
+Tramite gli \textbf{Integration Services}, l'hypervisor forza poi la sincronizzazione del clock alla ripresa (vitale per protocolli come Kerberos che falliscono se l'orario si disallinea), invia segnali di \textit{heartbeat} per capire se il kernel Guest è crashato, e orchestra spegnimenti puliti (graceful shutdown).
+
+\begin{tipbox}[Windows e il Secure World]
+Oggi la virtualizzazione è pervasiva anche sui dispositivi client. All'avvio, Windows moderno lancia in realtà due sistemi operativi. Il primo è un micro-OS nascosto (\textbf{Secure World}) che isola l'hardware crittografico (es. chiavi BitLocker). Subito dopo viene lanciato l'ambiente Windows utente, che ci gira accanto \textit{virtualizzato}. In questo modo, anche se un hacker ottiene i privilegi massimi (Ring 0) sul kernel di Windows, non potrà mai rubare le chiavi crittografiche, protette dall'invalicabile isolamento dell'hypervisor.
+\end{tipbox}
 
 \subsection{Il Virtual Switch (vSwitch)}
 Per connettere le VM al mondo esterno, l'Hypervisor implementa un \textbf{Virtual Switch} in memoria RAM. Le macchine virtuali possiedono schede di rete logiche (\textbf{vNIC}), che si collegano alle porte del vSwitch. A sua volta, il vSwitch instrada il traffico verso la rete fisica tramite le schede di rete reali del server (\textbf{pNIC}). Il vSwitch gestisce in software logiche complesse come tagging VLAN, traffic shaping e raggruppamento delle interfacce fisiche in modo del tutto trasparente per le macchine virtuali ospiti.
