@@ -1,0 +1,101 @@
+\chapter{Compute e Virtualizzazione}
+
+\section{Architettura Compute: CPU, GPU e NPU}
+L'elaborazione dei dati (Compute) è il terzo pilastro del datacenter. L'evoluzione hardware moderna è guidata dalla fine della scalabilità lineare del singolo core (Legge di Moore) e dalla necessità di efficienza e specializzazione per carichi di lavoro legati all'Intelligenza Artificiale.
+
+\subsection{Sostenibilità Energetica}
+I datacenter consumano enormi quantità di energia elettrica e acqua. Le metriche di riferimento sono:
+\begin{itemize}
+    \item \textbf{PUE (Power Usage Effectiveness):} Rapporto tra energia totale consumata dal datacenter e quella effettivamente usata dai server. Il valore ideale è 1.0.
+    \item \textbf{WUE (Water Usage Effectiveness):} Consumo idrico per kWh, critico nei datacenter che usano raffreddamento evaporativo (Torri di raffreddamento).
+\end{itemize}
+
+\subsection{Architettura CPU: Pipeline e Multi-Core}
+Storicamente, per aumentare le prestazioni, si aumentava la frequenza di clock e si ottimizzava la \textbf{Pipeline delle istruzioni} (suddivisa classicamente nelle fasi: \textit{Instruction Fetch, Decode, Execute, Memory Access, Write-back}). Aumentando la profondità della pipeline (fino a 20+ stadi), si potevano eseguire più istruzioni sovrapposte nel tempo, ma gli errori di previsione dei salti (\textit{Branch Misprediction}) causavano lo stallo e lo svuotamento completo della coda ("bolle" nella pipeline), vanificando l'efficienza. 
+
+Arrivati al limite fisico del calore dissipabile (Power Wall), si è passati al parallelismo Multi-Core. Per superare i colli di bottiglia della condivisione della RAM, le CPU moderne adottano architetture \textbf{NUMA (Non-Uniform Memory Access)}, in cui ogni processore ha un proprio banco di memoria locale ad accesso diretto rapido; l'accesso alla RAM degli altri processori avviene tramite interconnessioni esterne a latenza maggiore.
+Inoltre, per ridurre i tempi di inattività del processore si usa l'\textbf{Hyperthreading (SMT)}: vengono esposti due core logici per ogni core fisico, duplicando lo stato architettonico (registri) ma condividendo le unità di esecuzione (ALU).
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{images/ring_topology.png}
+    \caption{Schema logico di una topologia Ring, storicamente usata per l'interconnessione interna dei core CPU.}
+\end{figure}
+A livello di interconnessione interna (die), le vecchie architetture usavano un Ring Bus. Le CPU moderne preferiscono l'approccio a \textbf{Tile (o Chiplet)} uniti da \textbf{Mesh Network} o \textbf{Crossbar Switch}, migliorando enormemente le rese produttive (yield) e limitando l'impatto dei difetti di fabbricazione del silicio.
+
+\subsection{GPU e NPU: Il cambio di paradigma}
+\begin{itemize}
+    \item \textbf{CPU:} Ottimizzata per la \textit{minima latenza}. Pochi core molto complessi con esecuzione \textit{Out-of-Order} e grandi cache.
+    \item \textbf{GPU:} Ottimizzata per il \textit{massimo throughput}. Migliaia di core semplici che eseguono lo stesso calcolo in parallelo (SIMT), ideale per l'addestramento dell'AI.
+    \item \textbf{NPU (Neural Processing Unit):} Circuiti dedicati e specializzati esclusivamente nel calcolo tensoriale e inferenza AI a bassa precisione numerica e bassissimo consumo energetico.
+\end{itemize}
+
+\section{Architetture Server Fisici e BMC}
+L'involucro fisico (form factor) dei server si è diversificato negli anni per rispondere a diverse esigenze di densità, potenza di calcolo e dissipazione termica.
+
+\subsection{Server Rack (1U / 2U)}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{images/rack_server_1u.png}
+    \caption{Server Rack 1U standard con alloggiamenti per dischi frontali (hot-swap).}
+\end{figure}
+È il formato "general-purpose" più diffuso nei data center tradizionali. Un server rack è un computer completo e indipendente (dotato di propri alimentatori, ventole, CPU, RAM e dischi) racchiuso in uno chassis metallico standardizzato largo 19 pollici. L'altezza si misura in unità rack (U, circa 4,4 cm). Sono ideali per workload eterogenei, ma in grandi quantità richiedono un enorme lavoro di cablaggio singolo per ogni macchina (cavi di alimentazione e di rete separati per ogni singolo server).
+
+\subsection{Blade Server}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{images/blade_server.png}
+    \caption{Chassis Blade System: decine di server-lama inseriti in un singolo modulo.}
+\end{figure}
+Progettati per ottenere l'altissima densità necessaria nei cluster di virtualizzazione. Un sistema Blade si divide in due componenti: lo \textbf{Chassis} (l'involucro esterno che fornisce alimentazione condivisa, mega-ventole e switch di rete integrati) e le \textbf{Lame} (i server veri e propri). La lama (Blade) è sottilissima perché contiene solo CPU, RAM e pochi dischi; non ha ventole o alimentatori propri. Inserendola nello chassis, si collega automaticamente al \textit{midplane} posteriore, azzerando quasi totalmente il disordine del cablaggio nel rack.
+
+\subsection{Server HGX (AI GPU Server)}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{images/hgx_gpu_server.png}
+    \caption{Server HGX (aperto): GPU ad alte prestazioni coperte da enormi dissipatori metallici per gestire il calore estremo.}
+\end{figure}
+Con l'esplosione dell'intelligenza artificiale generativa, i normali server rack non sono più sufficienti. Un server HGX è una macchina immensa (spesso 4U o 8U, pesante oltre 100 kg) progettata esclusivamente attorno alle GPU (es. NVIDIA H100). Le GPU non sono più inserite come schede PCIe estraibili, ma sono saldate direttamente su una \textit{baseboard} proprietaria e interconnesse tramite bus dedicati (come NVLink) che scavalcano il collo di bottiglia del PCIe. Generano un calore spaventoso, rendendo spesso obbligatorio il passaggio al raffreddamento a liquido (\textit{Direct-to-Chip Liquid Cooling}).
+\begin{tipbox}[BMC (Baseboard Management Controller) e lo Standard Redfish]
+Tutti i server di livello enterprise montano un \textbf{BMC} (es. iLO di HPE o iDRAC di Dell). Si tratta di un micro-computer indipendente inserito nella scheda madre, dotato di una porta di rete dedicata (\textit{out-of-band management}). Essendo alimentato separatamente, permette il controllo fisico del server (accensione, configurazione BIOS, console KVM virtuale) anche se il sistema operativo principale è bloccato o se il server è fisicamente spento.
+
+\textbf{Redfish: L'API del Datacenter Moderno}\\
+Storicamente, i BMC venivano gestiti tramite il protocollo IPMI, che col tempo si è rivelato insicuro e difficile da integrare. Per questo motivo, il consorzio DMTF ha introdotto \textbf{Redfish}, lo standard moderno per la gestione dell'infrastruttura.
+\begin{itemize}
+    \item \textbf{Come funziona:} Redfish espone tutti i parametri hardware tramite una \textbf{RESTful API} standard. Utilizza i protocolli del web moderno (HTTPS per la sicurezza) e restituisce i dati in formato \textbf{JSON} (OData), facilmente leggibile sia dagli umani che dagli script.
+    \item \textbf{Cosa fa:} Permette di automatizzare su larga scala le operazioni più tediose. Tramite semplici script Python o strumenti come Ansible, si possono inviare richieste web (GET, POST, PATCH) per monitorare le temperature, aggiornare i firmware, modificare l'ordine di boot o riavviare un intero rack di server, indipendentemente dalla marca dell'hardware sottostante.
+\end{itemize}
+\end{tipbox}
+
+\section{Virtualizzazione e Live Migration}
+La virtualizzazione svincola il software dall'hardware fisico, permettendo a più Sistemi Operativi (Guest) di girare simultaneamente sullo stesso server fisico (Host). Il cuore di questo processo è l'\textbf{Hypervisor} (o Virtual Machine Monitor).
+
+\subsection{L'Evoluzione dell'Hypervisor: Dai Ring CPU alla Virtualizzazione Hardware}
+L'architettura x86 originale non era progettata per essere virtualizzata. Prevedeva quattro livelli di privilegio logici chiamati \textbf{Ring}, da Ring 0 (massimo privilegio, destinato al kernel del SO) a Ring 3 (spazio utente). 
+In un ambiente virtualizzato, l'Hypervisor deve avere il controllo assoluto, quindi deve risiedere in Ring 0. Questo costringeva i sistemi operativi Guest a scalare in Ring 1 (modalità non privilegiata, definita \textit{Ring De-privileging}). Poiché i SO Guest non sapevano di essere virtualizzati, tentavano di eseguire istruzioni privilegiate (es. manipolazione hardware) che, fallendo, venivano intrappolate dall'Hypervisor. Quest'ultimo doveva tradurle ed emularle in tempo reale (tecnica della \textbf{Binary Translation}), causando un enorme e insostenibile overhead prestazionale.
+
+Il problema è stato risolto nel 2005 dai produttori di CPU con l'introduzione di estensioni hardware dedicate (\textbf{Intel VT-x} e \textbf{AMD-V}). Queste istruzioni hanno creato un nuovo livello di privilegio inferiore allo zero (spesso chiamato colloquialmente \textbf{Ring -1}). Oggi l'Hypervisor risiede in Ring -1, permettendo ai kernel dei sistemi operativi Guest di operare nel loro nativo Ring 0, eseguendo istruzioni in modo diretto e a velocità hardware, annullando la necessità di lenta traduzione binaria.
+
+\subsection{Il Virtual Switch (vSwitch)}
+Per connettere le VM al mondo esterno, l'Hypervisor implementa un \textbf{Virtual Switch} in memoria RAM. Le macchine virtuali possiedono schede di rete logiche (\textbf{vNIC}), che si collegano alle porte del vSwitch. A sua volta, il vSwitch instrada il traffico verso la rete fisica tramite le schede di rete reali del server (\textbf{pNIC}). Il vSwitch gestisce in software logiche complesse come tagging VLAN, traffic shaping e raggruppamento delle interfacce fisiche in modo del tutto trasparente per le macchine virtuali ospiti.
+
+\subsection{Live Migration}
+La funzionalità più dirompente della virtualizzazione è la \textbf{Live Migration} (es. VMware vMotion), che permette di spostare una VM accesa da un host fisico a un altro senza interruzione di servizio.
+Si sviluppa in due fasi:
+\begin{enumerate}
+    \item \textbf{Pre-copy (Dirty tracking):} Trasferimento massivo della memoria mentre la VM gira, tracciando continuamente quali pagine vengono modificate nel frattempo.
+    \item \textbf{Stop and copy:} Una volta ridotto il set di dati "sporchi", la VM viene "congelata" per pochi millisecondi, viene copiato lo stato residuo dei registri e l'esecuzione riparte sul nuovo host fisico. Un \textit{Gratuitous ARP} informa gli switch fisici di reindirizzare il traffico verso la nuova destinazione.
+\end{enumerate}
+
+\section{Containerizzazione}
+A differenza della virtualizzazione, i \textbf{Container} non emulano un hardware o un intero kernel, ma \textbf{condividono il kernel Linux dell'host}. L'isolamento, vitale per impedire che i container collassino tra loro o consumino tutte le risorse, è gestito nativamente dal sistema operativo tramite due primitive fondamentali:
+\begin{itemize}
+    \item \textbf{Namespaces:} Isolano la visibilità logica. Un namespace fa credere al container di essere l'unico sistema in esecuzione, dotandolo di un proprio albero dei processi (PID namespace), un proprio stack di rete isolato (IP, porte) e mount point esclusivi.
+    \item \textbf{Cgroups (Control Groups):} Limitano e misurano l'utilizzo effettivo delle risorse fisiche hardware (impongono un tetto massimo di CPU, limiti ferrei sulla quantità di RAM allocabile o sull'I/O del disco).
+\end{itemize}
+
+\begin{tipbox}[Vantaggi dei Container]
+Essendo privi di kernel, i container (come Docker) si avviano in millisecondi, hanno un \textit{overhead} irrisorio e impacchettano l'applicazione con tutte le sue dipendenze e librerie, garantendo l'esecuzione identica su qualsiasi ambiente.
+L'orchestrazione a livello datacenter dei container viene tipicamente gestita tramite piattaforme come \textbf{Kubernetes}.
+\end{tipbox}
+L'integrazione di Container e Virtualizzazione è molto comune: il cloud moderno esegue spesso cluster Kubernetes composti da nodi che sono essi stessi macchine virtuali, combinando così la leggerezza del container con l'isolamento hardware e la "mobilità" della VM.
