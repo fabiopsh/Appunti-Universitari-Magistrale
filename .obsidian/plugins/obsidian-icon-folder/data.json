@@ -6,11 +6,11 @@
     "emojiStyle": "native",
     "iconColor": null,
     "recentlyUsedIcons": [
+      "🔚",
       "LiAArrowDown",
       "LiCloud",
       "LiFileUp",
-      "LiPencilRuler",
-      "LiActivity"
+      "LiPencilRuler"
     ],
     "recentlyUsedIconsSize": 5,
     "rules": [],
@@ -131,5 +131,6 @@
   "2 Semestre 1 Anno/Datacenter Design and Operation/Lezione 17 - Cloud Computing.md": "LiCloud",
   "2 Semestre 1 Anno/Datacenter Design and Operation/Lezione 18 - Control Layer, Orchestrazione e SLA.md": "LiCloud",
   "2 Semestre 1 Anno/Peer to Peer Systems and Blockchain/Lezione 27 - Applicazioni Reali con Smart Contracts.md": "LiAArrowDown",
-  "2 Semestre 1 Anno/Datacenter Design and Operation/Lezione 19 - Business Continuity e Security.md": "LiCloud"
+  "2 Semestre 1 Anno/Datacenter Design and Operation/Lezione 19 - Business Continuity e Security.md": "LiCloud",
+  "2 Semestre 1 Anno/Datacenter Design and Operation/Lezione 20 - Operations e Considerazioni Finali.md": "🔚"
 }
