@@ -1,0 +1,97 @@
+\documentclass[12pt,a4paper,oneside]{book}
+
+% =====================
+% Pacchetti fondamentali
+% =====================
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+\usepackage{lmodern}
+\usepackage{microtype}
+
+% =====================
+% Geometria e Layout
+% =====================
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\nouppercase{\leftmark}}
+\fancyhead[R]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% =====================
+% Colori e Grafica
+% =====================
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{wrapfig}
+\usepackage[font=small,labelfont=bf]{caption}
+
+% =====================
+% Box ed Evidenziazioni (per definizioni, tip, alert)
+% =====================
+\usepackage[most]{tcolorbox}
+
+\newtcolorbox{definitionbox}[1][]{
+  colback=blue!5!white,
+  colframe=blue!75!black,
+  fonttitle=\bfseries,
+  title=#1,
+  enhanced,
+  attach boxed title to top left={yshift=-2mm,xshift=2mm},
+}
+
+\newtcolorbox{warningbox}[1][]{
+  colback=red!5!white,
+  colframe=red!75!black,
+  fonttitle=\bfseries,
+  title=#1,
+  enhanced,
+  attach boxed title to top left={yshift=-2mm,xshift=2mm},
+}
+
+\newtcolorbox{tipbox}[1][]{
+  colback=green!5!white,
+  colframe=green!50!black,
+  fonttitle=\bfseries,
+  title=#1,
+  enhanced,
+  attach boxed title to top left={yshift=-2mm,xshift=2mm},
+}
+
+% =====================
+% Link e Indice
+% =====================
+\usepackage[colorlinks=true, linkcolor=blue!70!black, urlcolor=blue!70!black]{hyperref}
+
+% =====================
+% Dati Documento
+% =====================
+\title{\textbf{Datacenter Design and Operation}\\ \Large Synthetic and Reworked Notes}
+\author{Edited by Fabio Piscitelli M.715339}
+\date{Academic Year 2025/2026}
+
+\begin{document}
+
+\frontmatter
+\maketitle
+\tableofcontents
+
+\mainmatter
+
+% =====================
+% Inclusioni Capitoli
+% =====================
+\include{capitoli/01_introduzione_architettura}
+\include{capitoli/02_reti_fabric}
+\include{capitoli/03_storage}
+\include{capitoli/04_compute_virtualizzazione}
+\include{capitoli/05_cloud_orchestrazione_sicurezza}
+\include{capitoli/06_operations_considerazioni}
+
+\backmatter
+% Eventuale bibliografia o glossario finale
+
+\end{document}

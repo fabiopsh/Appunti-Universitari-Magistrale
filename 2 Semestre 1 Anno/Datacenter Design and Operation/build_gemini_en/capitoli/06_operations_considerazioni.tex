@@ -1,0 +1,54 @@
+\chapter{Operations and Final Considerations}
+
+\section{Service Operations Management}
+This phase closes the datacenter lifecycle by addressing the procedural and operational part: everything that happens \textit{after} the infrastructure is up and running. Keeping a cloud running means ensuring compliance with \textbf{SLAs (Service Level Agreements)}, identifying failures, planning resources, and tracking every change.
+The main activities are grouped into:
+\begin{itemize}
+    \item \textbf{Monitoring:} Continuously observing the state of the infrastructure and identifying anomalies.
+    \item \textbf{Configuration and Change Management:} Tracking inventory and governing every change to the system.
+    \item \textbf{Capacity Management:} Understanding how many resources will be needed in the coming months to procure them before they run out.
+    \item \textbf{Incident and Problem Management:} Responding to unplanned events and preventing their recurrence.
+\end{itemize}
+
+\subsection{Monitoring and Predictive Failure}
+In a modern infrastructure, there are millions of counters (network, hypervisor, BMC). Since every "clean" system generates thousands of warnings in the logs, the real job of monitoring is separating actual problems from background noise using historical data.
+We distinguish between:
+\begin{itemize}
+    \item \textbf{Configuration monitoring:} Detecting unauthorized changes or policy violations.
+    \item \textbf{Availability monitoring:} Verifying the reachability of services and the status of individual hardware components (e.g., disks).
+    \item \textbf{Security monitoring:} Fundamental in public clouds, it monitors logical and physical access (e.g., biometric sensors at doors).
+\end{itemize}
+
+An advanced feature is \textbf{Predictive Failure Analysis}: BMCs integrate statistical models and, by analyzing a disk's patterns, issue a warning \textit{before} it breaks. This allows removing it from the pool, replacing it, and reinserting it without any impact on the user.
+\begin{warningbox}[The redundancy clock and cascading effects]
+When a component fails, the "clock starts ticking": redundancy is reduced and replacement must be swift. A failure can also generate a \textbf{cascading effect}: the load shifted to other healthy nodes overloads them, causing them to crash in turn.
+\end{warningbox}
+
+\subsection{Capacity Monitoring and Management}
+Capacity Management thinks like an insurance company: statistical estimates are made, and the bet is that not everyone will use resources to the maximum concurrently. This allows the practice of \textbf{Overbooking} (or CPU and network \textit{over-commitment}).
+Some operational techniques include:
+\begin{itemize}
+    \item \textbf{Dynamic scheduling:} Automatic load balancing among the vCPUs of physical servers.
+    \item \textbf{Storage Tiering:} Moving the disks of powered-off VMs to slow, inexpensive storage. Upon power-on, the VM is started and the storage undergoes a background live migration to a fast tier, totally transparent to the user.
+\end{itemize}
+
+\section{Change and Failure Management}
+
+\subsection{Change Management}
+It is the process aimed at recording every single change to a system's configuration in the \textbf{CMDB (Configuration Management Database)}. When something breaks, the operations team's first question is always "who touched something?". Any structural change (e.g. DB update) requires a strict process: creating a snapshot (guaranteeing reversibility in case of rollback), updating, verifying and, only if successful, deleting the snapshot so as not to burden future I/O performance due to the chain of differential files.
+
+\subsection{Incident vs. Problem Management}
+The ITIL distinction between incident and problem is vital for operations:
+\begin{definitionbox}[Incident vs Problem]
+An \textbf{Incident} is an unplanned event that degrades a service (\textit{reactive} approach: resolving the symptom in the shortest possible time).
+A \textbf{Problem} is the root cause of one or more incidents (\textit{proactive} approach: eliminating the cause to prevent it from happening again).
+\end{definitionbox}
+Practical example: a disk breaks and a storage pool runs out (incident). Changing the disk resolves the incident. \textit{Problem management} investigates and discovers that the pool was already too saturated, so the long-term solution is to expand the cluster's overall capacity to prevent future failures.
+
+\section{Final Considerations on the Datacenter}
+The evolution of IT has followed a path starting from physical foundations (energy, dissipation) up to total abstraction (cloud). Some summary key concepts:
+\begin{itemize}
+    \item \textbf{The principle of balance:} An efficient system is not the one with the best absolute component, but the balanced one. A lightning-fast CPU with a mechanical disk storage will result in a slow system. Datacenter design is inherently an exercise in avoiding and managing bottlenecks.
+    \item \textbf{Workload divergence:} While hardware was once "general-purpose", today workloads diverge. Artificial Intelligence requires enormous amounts of memory, densely packed GPUs, and ultra-low network latencies, leading to thermal power concentrations (up to gigawatts in single buildings) and extreme direct-to-chip liquid cooling solutions unthinkable a decade ago.
+    \item \textbf{Architecting for the load:} Faced with massive data flows (e.g., CERN experiments that produce 10 TB/s but discard 90\% after initial processing), the engineer must size frontend and backend asymmetrically, choosing the infrastructure (SAN vs Object/NAS) based on the actual access patterns, acceptable latency, and required parallelism.
+\end{itemize}
