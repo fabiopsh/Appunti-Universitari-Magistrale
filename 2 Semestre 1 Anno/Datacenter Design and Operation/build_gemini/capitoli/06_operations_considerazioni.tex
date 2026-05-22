@@ -1,0 +1,54 @@
+\chapter{Operations e Considerazioni Finali}
+
+\section{Service Operations Management}
+Questa fase chiude il ciclo di vita del datacenter affrontando la parte procedurale e operativa: tutto ciò che avviene \textit{dopo} che l'infrastruttura è in piedi. Mantenere funzionante un cloud significa garantire il rispetto degli \textbf{SLA (Service Level Agreement)}, identificare guasti, pianificare le risorse e tracciare ogni modifica.
+Le attività principali si raggruppano in:
+\begin{itemize}
+    \item \textbf{Monitoring:} Osservare continuamente lo stato dell'infrastruttura e identificare anomalie.
+    \item \textbf{Configuration e Change Management:} Tracciare l'inventario e governare ogni modifica al sistema.
+    \item \textbf{Capacity Management:} Capire quante risorse serviranno nei prossimi mesi per approvvigionarle prima che si esauriscano.
+    \item \textbf{Incident e Problem Management:} Rispondere a eventi non pianificati e prevenire la loro ricorrenza.
+\end{itemize}
+
+\subsection{Monitoring e Predictive Failure}
+In un'infrastruttura moderna esistono milioni di contatori (rete, hypervisor, BMC). Poiché ogni sistema "pulito" genera migliaia di warning nei log, il vero lavoro del monitoring è separare i problemi reali dal rumore di fondo usando i dati storici.
+Si distinguono:
+\begin{itemize}
+    \item \textbf{Configuration monitoring:} Rilevare modifiche non autorizzate o violazioni di policy.
+    \item \textbf{Availability monitoring:} Verificare la raggiungibilità dei servizi e lo stato dei singoli componenti hardware (es. dischi).
+    \item \textbf{Security monitoring:} Fondamentale nei cloud pubblici, monitora accessi logici e fisici (es. sensori biometrici alle porte).
+\end{itemize}
+
+Una funzionalità avanzata è la \textbf{Predictive Failure Analysis}: i BMC integrano modelli statistici e, analizzando i pattern di un disco, emettono un avviso \textit{prima} che si rompa. Questo permette di rimuoverlo dal pool, sostituirlo e reinserirlo senza alcun impatto sull'utente.
+\begin{warningbox}[Il clock della ridondanza e gli effetti a cascata]
+Quando un componente guasta, il "clock comincia a ticchettare": la ridondanza è ridotta e la sostituzione deve essere rapida. Un fallimento può inoltre generare un \textbf{effetto a cascata}: il carico spostato su altri nodi sani li sovraccarica, facendoli crollare a loro volta.
+\end{warningbox}
+
+\subsection{Capacity Monitoring e Management}
+Il Capacity Management ragiona come una compagnia assicurativa: si fanno stime statistiche e si scommette che non tutti useranno le risorse al massimo contemporaneamente. Questo permette la pratica dell'\textbf{Overbooking} (o \textit{over-commitment} di CPU e rete).
+Alcune tecniche operative includono:
+\begin{itemize}
+    \item \textbf{Dynamic scheduling:} Bilanciamento automatico del carico tra le vCPU dei server fisici.
+    \item \textbf{Tiering dello storage:} Spostare i dischi delle VM spente su storage lento ed economico. Alla riaccensione, la VM viene avviata e lo storage subisce una live migration in backgroud verso un tier veloce in modo totalmente trasparente per l'utente.
+\end{itemize}
+
+\section{Gestione dei Cambiamenti e dei Guasti}
+
+\subsection{Change Management}
+È il processo volto a registrare ogni singola modifica alla configurazione di un sistema nel \textbf{CMDB (Configuration Management Database)}. Quando qualcosa si rompe, la prima domanda del team operations è sempre "chi ha toccato qualcosa?". Qualsiasi modifica strutturale (es. aggiornamento DB) richiede un processo rigido: creazione di uno snapshot (garantendo la reversibilità in caso di rollback), aggiornamento, verifica e, solo se ha successo, eliminazione dello snapshot per non gravare sulle performance di I/O future a causa della catena dei file differenziali.
+
+\subsection{Incident vs. Problem Management}
+La distinzione ITIL tra incidente e problema è vitale per le operations:
+\begin{definitionbox}[Incidente vs Problema]
+Un \textbf{Incidente} è un evento non pianificato che degrada un servizio (approccio \textit{reattivo}: si risolve il sintomo nel minor tempo possibile).
+Un \textbf{Problema} è la causa radice di uno o più incidenti (approccio \textit{proattivo}: si elimina la causa per evitare che si ripeta).
+\end{definitionbox}
+Esempio pratico: un disco si rompe e un pool di storage si esaurisce (incidente). Cambiare il disco risolve l'incidente. Il \textit{problem management} indaga e scopre che il pool era già troppo saturo, quindi la soluzione a lungo termine è espandere la capacità generale del cluster per prevenire guasti futuri.
+
+\section{Considerazioni Finali sul Datacenter}
+L'evoluzione dell'IT ha seguito un percorso che parte dalle basi fisiche (energia, dissipazione) fino all'astrazione totale (cloud). Alcuni concetti chiave riassuntivi:
+\begin{itemize}
+    \item \textbf{Il principio del bilanciamento:} Un sistema efficiente non è quello con il miglior componente assoluto, ma quello bilanciato. Una CPU iperveloce con uno storage a dischi meccanici darà un sistema lento. Il design del datacenter è per sua natura un esercizio per evitare e gestire i colli di bottiglia.
+    \item \textbf{Workload divergence:} Mentre un tempo l'hardware era "general-purpose", oggi i carichi divergono. L'Intelligenza Artificiale richiede enormi quantità di memoria, GPU densamente impacchettate e latenze di rete ultra-basse, portando a concentrazioni di potenza termica (fino a gigawatt in singoli edifici) e soluzioni estreme di direct-to-chip liquid cooling impensabili un decennio fa.
+    \item \textbf{Architettare per il carico:} Di fronte a enormi flussi di dati (es. gli esperimenti del CERN che producono 10 TB/s ma ne scartano il 90\% dopo una prima elaborazione), l'ingegnere deve dimensionare frontend e backend in modo asimmetrico, scegliendo l'infrastruttura (SAN vs Object/NAS) in base ai reali pattern di accesso, latenza accettabile e parallelismo richiesto.
+\end{itemize}

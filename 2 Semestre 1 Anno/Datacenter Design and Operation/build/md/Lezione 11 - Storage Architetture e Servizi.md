@@ -10,7 +10,6 @@ data: 2026-04-16
 lezione: "Storage: Architetture e Servizi"
 professore: "Antonio Cisternino"
 ---
-
 # Storage: Architetture e Servizi
 
 La lezione parte da un'osservazione apparentemente banale: il termine *disk drive* è ormai un anacronismo. I moderni dispositivi di storage non contengono più dischi rotanti, eppure continuiamo a chiamarli così — esattamente come l'icona del floppy disk campeggia ancora sul pulsante "Salva" di moltissime applicazioni. Questo è un caso esemplare del **principio di sostituzione**: quando si evolve una tecnologia, spesso si mantiene il form factor precedente per compatibilità con l'infrastruttura esistente, anche quando il nuovo dispositivo non ne ha più bisogno.
