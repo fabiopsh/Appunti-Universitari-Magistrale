@@ -40,8 +40,7 @@ I token fungibili trovano impiego in scenari economici diversi. Nelle **ICO** (*
 
 La distinzione visiva tra fungibile e non fungibile è immediata: due palline da baseball identiche prodotte in serie sono fungibili; una pallina firmata da Babe Ruth è non fungibile, perché quella firma la rende unica e irreplicabile. Analogamente, la Gioconda è non fungibile (un originale), mentre una maglietta con la stampa della Gioconda è fungibile (producibile in mille copie).
 
-![Diagramma Mermaid](images/mermaid-lezione-22-fungible-e-non-fungible-tokens-erc-standards-01.png)
-*Fig. — Tassonomia degli asset secondo fungibilità e tangibilità: i token intangibili fungibili includono criptovalute e carbon credit, quelli non fungibili includono arte digitale e copyright.*
+![Tassonomia degli asset secondo fungibilità e tangibilità: i token intangibili fungibili includono criptovalute e carbon credit, quelli non fungibili includono arte digitale e copyright.](images/mermaid-lezione-22-fungible-e-non-fungible-tokens-erc-standards-01.png)
 
 Un NFT può rappresentare oggetti digitali unici come opere d'arte, oggetti in-game, domini .eth; asset fisici come immobili o opere d'arte reali (la tokenizzazione rende il trasferimento di proprietà più efficiente riducendo il rischio di frodi); oppure certificati di proprietà e identità. Il fenomeno dei **Beanie Babies** negli anni '90 anticipa molte dinamiche degli NFT: produzione limitata, ritiro deliberato di edizioni per creare scarsità, difetti intenzionali che generano edizioni ultra-rare. La psicologia del collezionismo è la stessa.
 
@@ -120,8 +119,7 @@ La funzione `transfer` implementa una transazione diretta in un solo passo: il p
 
 Il meccanismo di **allowance** risolve un problema pratico: in molti scenari (pagamenti ricorrenti, marketplace, DeFi) è necessario che una terza parte esegua transazioni per conto del proprietario, senza che il proprietario debba approvare ogni singola operazione.
 
-![Diagramma Mermaid](images/mermaid-lezione-22-fungible-e-non-fungible-tokens-erc-standards-02.png)
-*Fig. — Flusso del meccanismo allowance: il proprietario approva una quota, il delegato la utilizza con transferFrom.*
+![Flusso del meccanismo allowance: il proprietario approva una quota, il delegato la utilizza con transferFrom.](images/mermaid-lezione-22-fungible-e-non-fungible-tokens-erc-standards-02.png)
 
 Il mapping interno che traccia le allowance è una struttura a due livelli:
 
@@ -322,8 +320,7 @@ I metadati tipici di un NFT includono:
 
 La funzione `tokenURI(uint256 tokenId)` è il punto di accesso ai metadata: dato un tokenId, restituisce un URI che punta a un file JSON. Questo URI può essere un URL HTTP (`https://my-nft-site.com/metadata/123.json`) oppure un link IPFS (`ipfs://Qm.../123.json`). Il file JSON contiene a sua volta ulteriori link, tra cui il link all'immagine vera e propria.
 
-![Schema del flusso NFT Image → JSON Metadata → Traits & Attributes](images/lezione-22-fungible-e-non-fungible-tokens-erc-standards-img-01.jpg)
-*Fig. — Il flusso dei metadata di un NFT: la `tokenURI` punta al JSON, che contiene il link IPFS all'immagine e l'array di attributi usati da marketplace e sistemi per filtrare e calcolare la rarità.*
+![Il flusso dei metadata di un NFT: la `tokenURI` punta al JSON, che contiene il link IPFS all'immagine e l'array di attributi usati da marketplace e sistemi per filtrare e calcolare la rarità.](images/lezione-22-fungible-e-non-fungible-tokens-erc-standards-img-01.jpg)
 
 #### Perché gli attributi se c'è l'immagine?
 
@@ -341,8 +338,7 @@ La soluzione off-chain prevalente è l'**IPFS** (*InterPlanetary File System*), 
 
 Le royalties permettono all'autore originale di un NFT di ricevere una percentuale automatica su ogni rivendita futura, senza dover fare nulla. Il contratto traccia la percentuale scelta dall'artista e, ogni volta che l'NFT cambia mano, invia automaticamente la quota al wallet del creatore.
 
-![Infografica sulle ongoing royalties con NFT](images/lezione-22-fungible-e-non-fungible-tokens-erc-standards-img-02.jpg)
-*Fig. — Il meccanismo delle royalties: Alice crea e vende NFT #123 per 1 ETH con royalty del 5%. Ad ogni rivendita futura (10 ETH, 10 ETH, 20 ETH), Alice riceve automaticamente il 5% — rispettivamente 0.05, 0.5, 0.5, 1 ETH — senza alcuna azione da parte sua.*
+![Il meccanismo delle royalties: Alice crea e vende NFT #123 per 1 ETH con royalty del 5%. Ad ogni rivendita futura (10 ETH, 10 ETH, 20 ETH), Alice riceve automaticamente il 5% — rispettivamente 0.05, 0.5, 0.5, 1 ETH — senza alcuna azione da parte sua.](images/lezione-22-fungible-e-non-fungible-tokens-erc-standards-img-02.jpg)
 
 #### Unlockable Content
 
@@ -350,8 +346,7 @@ L'*unlockable content* è contenuto visibile o accessibile solo al proprietario 
 
 Il flusso di verifica che una piattaforma deve implementare è:
 
-![Diagramma Mermaid](images/mermaid-lezione-22-fungible-e-non-fungible-tokens-erc-standards-03.png)
-*Fig. — Flusso di verifica per l'unlockable content: la piattaforma chiama `ownerOf(tokenId)` on-chain e confronta il risultato con il wallet connesso dall'utente.*
+![Flusso di verifica per l'unlockable content: la piattaforma chiama `ownerOf(tokenId)` on-chain e confronta il risultato con il wallet connesso dall'utente.](images/mermaid-lezione-22-fungible-e-non-fungible-tokens-erc-standards-03.png)
 
 ---
 
@@ -359,8 +354,7 @@ Il flusso di verifica che una piattaforma deve implementare è:
 
 La differenza architetturale tra i due standard si riassume in come viene organizzato il registro interno:
 
-![Diagramma Mermaid](images/mermaid-lezione-22-fungible-e-non-fungible-tokens-erc-standards-04.png)
-*Fig. — ERC-20 mappa indirizzi a quantità (fungibile); ERC-721 mappa ID unici a proprietari (non fungibile).*
+![ERC-20 mappa indirizzi a quantità (fungibile); ERC-721 mappa ID unici a proprietari (non fungibile).](images/mermaid-lezione-22-fungible-e-non-fungible-tokens-erc-standards-04.png)
 
 ---
 
@@ -443,8 +437,7 @@ Nessuno di questi è un nodo "privilegiato": la rete IPFS è piatta, ogni peer m
 
 Prima di entrare nei dettagli, è utile avere in mente l'architettura a livelli di IPFS. Il sistema si presenta come uno stack, in cui ogni livello si appoggia a quello sottostante e risolve un problema distinto.
 
-![Diagramma Mermaid](images/mermaid-lezione-24-ipfs-interplanetary-file-system-01.png)
-*Fig. — Lo stack IPFS: il livello più basso trasporta i dati (network, routing, exchange), quello intermedio li definisce (Merkle-DAG, naming), quello superiore li usa (applicazioni).*
+![Lo stack IPFS: il livello più basso trasporta i dati (network, routing, exchange), quello intermedio li definisce (Merkle-DAG, naming), quello superiore li usa (applicazioni).](images/mermaid-lezione-24-ipfs-interplanetary-file-system-01.png)
 
 Tre blocchi logici emergono chiaramente. In basso troviamo **Transporting Data**, il compito di muovere bit tra peer: network (libp2p), routing (DHT), exchange (Bitswap). Al centro **Defining Data**, dove i bit diventano strutture identificabili: Merkle-DAG e naming (IPNS). In cima **Using Data**, dove le applicazioni si appoggiano a tutto il resto.
 
@@ -512,8 +505,7 @@ Anche se oggi il sistema usa di fatto solo SHA-256, il formato multihash segnala
 
 Un CIDv1 mette insieme tutti questi elementi: una versione, un multicodec che descrive il formato di serializzazione del contenuto, un multihash (con codice della funzione di hash, lunghezza e valore). La stringa visibile all'utente è poi passata attraverso multibase per essere codificata in caratteri stampabili.
 
-![Diagramma Mermaid](images/mermaid-lezione-24-ipfs-interplanetary-file-system-02.png)
-*Fig. — Struttura a byte di un CIDv1 (dag-pb, sha2-256): versione, multicodec, funzione di hash, lunghezza, digest.*
+![Struttura a byte di un CIDv1 (dag-pb, sha2-256): versione, multicodec, funzione di hash, lunghezza, digest.](images/mermaid-lezione-24-ipfs-interplanetary-file-system-02.png)
 
 Il CID completo è quindi un flusso di byte che viene poi raggruppato in chunk da 5 bit e codificato — tramite multibase — in caratteri Base32 (o altra base). Il carattere di prefisso della stringa finale identifica la base usata, completando il quadro auto-descrittivo.
 
@@ -537,8 +529,7 @@ L'aggettivo "Merkle" viene dalle classiche strutture crittografiche di Ralph Mer
 
 Quando aggiungi un file a IPFS, il sistema lo divide in **chunk** (blocchi di dimensione fissa o variabile). Per ogni chunk calcola un digest e crea un CID. Poi costruisce un nodo "indice" che contiene i CID dei chunk in ordine, e ne calcola a sua volta il CID: questo è il **base CID** del file.
 
-![Diagramma Mermaid](images/mermaid-lezione-24-ipfs-interplanetary-file-system-03.png)
-*Fig. — Costruzione del Merkle DAG di un file: chunking, hashing, generazione dei CID dei figli e del CID radice.*
+![Costruzione del Merkle DAG di un file: chunking, hashing, generazione dei CID dei figli e del CID radice.](images/mermaid-lezione-24-ipfs-interplanetary-file-system-03.png)
 
 #### Deduplicazione automatica
 
@@ -548,8 +539,7 @@ L'esempio limite è evocativo: immagina che ogni lettera dell'alfabeto abbia il 
 
 Il diagramma seguente mostra concretamente come IPLD organizza i dati in un Merkle DAG, evidenziando il caso in cui un nodo (qui `CID_D`) è **condiviso** fra più genitori — ed è proprio questo che rende la struttura un DAG e non un semplice albero.
 
-![Merkle DAG in IPFS (IPLD) — nodi che contengono link ai figli tramite CID, con un nodo condiviso fra due genitori](images/lezione-24-ipfs-interplanetary-file-system-img-01.jpg)
-*Fig. — Merkle DAG in IPFS (IPLD). `CID_root` contiene i CID dei figli `CID_A` e `CID_B` (entrambe directory). Il file `CID_D` è referenziato sia da `CID_A` sia da `CID_B`: essendo identificato dall'hash del suo contenuto, viene memorizzato una sola volta ma puntato da più genitori. A destra, l'esempio del payload serializzato di `CID_B`, che elenca i suoi figli come coppie `(name, link)`.*
+![Merkle DAG in IPFS (IPLD). `CID_root` contiene i CID dei figli `CID_A` e `CID_B` (entrambe directory). Il file `CID_D` è referenziato sia da `CID_A` sia da `CID_B`: essendo identificato dall'hash del suo contenuto, viene memorizzato una sola volta ma puntato da più genitori. A destra, l'esempio del payload serializzato di `CID_B`, che elenca i suoi figli come coppie `(name, link)`.](images/lezione-24-ipfs-interplanetary-file-system-img-01.jpg)
 
 #### Proprietà del Merkle DAG
 
@@ -676,8 +666,7 @@ Il white paper originale introduce anche una **strategia di bartering** di base 
 
 Il protocollo ruota attorno a quattro tipi di messaggio: **WANT** (voglio questo CID), **HAVE** (ho questo CID), **REQUEST** (mandami il blocco), **BLOCK** (ecco il blocco).
 
-![Diagramma Mermaid](images/mermaid-lezione-24-ipfs-interplanetary-file-system-04.png)
-*Fig. — Scambio Bitswap: il nodo A chiede un blocco, il nodo B conferma di averlo, A richiede i dati e B li invia. A verifica l'integrità ricalcolando il CID.*
+![Scambio Bitswap: il nodo A chiede un blocco, il nodo B conferma di averlo, A richiede i dati e B li invia. A verifica l'integrità ricalcolando il CID.](images/mermaid-lezione-24-ipfs-interplanetary-file-system-04.png)
 
 **A cosa serve HAVE?** Fornisce una **conferma in tempo reale**: la DHT dice "potrebbe avere", HAVE dice "ce l'ho *adesso*". È un messaggio **opzionale**: un peer può rispondere direttamente con il blocco (`WANT → REQUEST → BLOCK`), saltando la conferma intermedia. Bitswap è **best effort**: se un peer non risponde, il richiedente può provare con altri peer — nessuna garanzia di consegna da un singolo fornitore, ma alta probabilità grazie alla molteplicità.
 
@@ -772,8 +761,7 @@ Il problema di partenza è concreto: un'azienda come Alpha Corporation progetta 
 
 La soluzione proposta è una **blockchain permissioned**: una rete P2P privata in cui solo i partecipanti autorizzati possono unirsi e aggiungere blocchi. A differenza di una blockchain pubblica come Ethereum, l'accesso è controllato da un'entità centralizzata — in questo caso Alpha — che gestisce le chiavi pubbliche dei partecipanti tramite un **Membership Service Provider (MSP)**.
 
-![Diagramma Mermaid](images/mermaid-lezione-27-applicazioni-reali-con-smart-contracts-01.png)
-*Fig. — Architettura di una blockchain permissioned: ogni organizzazione gestisce un peer node e condivide un ledger immutabile; l'accesso è mediato dal Membership Service Provider (MSP).*
+![Architettura di una blockchain permissioned: ogni organizzazione gestisce un peer node e condivide un ledger immutabile; l'accesso è mediato dal Membership Service Provider (MSP).](images/mermaid-lezione-27-applicazioni-reali-con-smart-contracts-01.png)
 
 Il processo di bootstrap avviene in questo modo:
 
@@ -793,8 +781,7 @@ Ogni componente prodotto da A2 riceve una propria coppia di chiavi: la chiave pu
 
 Quando un componente viene registrato sulla blockchain, all'annuncio della sua chiave pubblica può essere allegato uno smart contract. Questo contratto può innescare automaticamente richieste di manutenzione, ordini di sostituzione o procedure di dismissione senza intervento umano.
 
-![Diagramma Mermaid](images/mermaid-lezione-27-applicazioni-reali-con-smart-contracts-02.png)
-*Fig. — Flusso di automazione: dal rilevamento della condizione critica (IoT) all'esecuzione dello smart contract, fino alla registrazione immutabile dell'intervento.*
+![Flusso di automazione: dal rilevamento della condizione critica (IoT) all'esecuzione dello smart contract, fino alla registrazione immutabile dell'intervento.](images/mermaid-lezione-27-applicazioni-reali-con-smart-contracts-02.png)
 
 ##### Revoca delle certificazioni
 
@@ -856,8 +843,7 @@ Il ciclo di vita di una stable coin fiat-backed si articola in tre operazioni go
 
 **Withdrawal** — Bob ritira 60 USD reali. Il custodian chiama `burn(Bob, 60)` sul contratto, distruggendo i token. Il saldo di Bob scende a 25 USDC, la riserva del custodian si riduce a 75 USD, e Bob riceve 60 USD fisici.
 
-![Diagramma Mermaid](images/mermaid-lezione-27-applicazioni-reali-con-smart-contracts-03.png)
-*Fig. — Ciclo completo di una stable coin fiat-backed: il minting e il withdrawal coinvolgono il custodian; il trasferimento è puramente on-chain.*
+![Ciclo completo di una stable coin fiat-backed: il minting e il withdrawal coinvolgono il custodian; il trasferimento è puramente on-chain.](images/mermaid-lezione-27-applicazioni-reali-con-smart-contracts-03.png)
 
 ##### Stabilità tramite arbitraggio
 
@@ -877,8 +863,7 @@ Le stable coin algoritmiche mantengono il peg senza riserve complete, usando alg
 
 I protocolli DeFi di lending replicano on-chain la funzione delle banche commerciali: chi ha liquidità la presta guadagnando interessi; chi ha asset ma non vuole venderli ottiene liquidità depositando collaterale. Il sistema coinvolge quattro attori: lender, borrower, price oracle e liquidator.
 
-![Diagramma Mermaid](images/mermaid-lezione-27-applicazioni-reali-con-smart-contracts-04.png)
-*Fig. — Modello generale del lending DeFi: il vault gestisce collaterale e debito; l'oracle fornisce prezzi; il liquidator interviene quando il Health Factor scende sotto 1.*
+![Modello generale del lending DeFi: il vault gestisce collaterale e debito; l'oracle fornisce prezzi; il liquidator interviene quando il Health Factor scende sotto 1.](images/mermaid-lezione-27-applicazioni-reali-con-smart-contracts-04.png)
 
 ##### Il lender
 
@@ -930,8 +915,7 @@ La potenza dei flash loan risiede nel permettere accesso a capitali enormi per p
 5. Profitto netto: ~24.100 USDC.
 6. Tutta la sequenza è un'unica transazione atomica: se un passo fallisce, tutto si reverte e il prestito non viene mai erogato.
 
-![Diagramma Mermaid](images/mermaid-lezione-27-applicazioni-reali-con-smart-contracts-05.png)
-*Fig. — Flash loan per arbitraggio: borrow → buy on DEX A → sell on DEX B → repay, tutto in un'unica transazione atomica.*
+![Flash loan per arbitraggio: borrow → buy on DEX A → sell on DEX B → repay, tutto in un'unica transazione atomica.](images/mermaid-lezione-27-applicazioni-reali-con-smart-contracts-05.png)
 
 ---
 
@@ -956,8 +940,7 @@ Un exchange centralizzato (CEX) funziona come un mercato finanziario tradizional
 
 Un exchange decentralizzato (DEX) consente agli utenti di scambiare token direttamente dal proprio wallet, senza depositare fondi su una piattaforma centralizzata. I token vengono acquistati da una **liquidity pool**: un deposito di coppia di token (es. USDC/WETH) fornito da utenti chiamati **Liquidity Provider (LP)**, che guadagnano le fee sulle transazioni. Il prezzo non emerge da ordini umani ma da una formula matematica eseguita dallo smart contract.
 
-![Diagramma Mermaid](images/mermaid-lezione-27-applicazioni-reali-con-smart-contracts-06.png)
-*Fig. — Struttura di un DEX: i liquidity provider alimentano la pool con entrambi i token della coppia; il trader swappa pagando una fee che va agli LP.*
+![Struttura di un DEX: i liquidity provider alimentano la pool con entrambi i token della coppia; il trader swappa pagando una fee che va agli LP.](images/mermaid-lezione-27-applicazioni-reali-con-smart-contracts-06.png)
 
 #### Automated Market Maker (AMM)
 
@@ -971,8 +954,7 @@ Il cuore matematico dell'AMM è la **constant product formula**:
 >
 > dove $x$ = quantità del token X nella pool, $y$ = quantità del token Y, $k$ = costante. Il prodotto dei due saldi rimane costante dopo ogni swap.
 
-![Constant Product Formula: iperbola xy=k con stato prima e dopo uno swap](images/lezione-27-applicazioni-reali-con-smart-contracts-img-01.jpg)
-*Fig. — La curva iperbola $xy = k$: a sinistra lo stato iniziale ($x_0 = 10, y_0 = 30, k = 300$); a destra lo stato dopo uno swap ($x_1 = 15, y_1 = 20, k$ rimane 300). Il punto si muove lungo la curva mantenendo il prodotto costante.*
+![La curva iperbola $xy = k$: a sinistra lo stato iniziale ($x_0 = 10, y_0 = 30, k = 300$); a destra lo stato dopo uno swap ($x_1 = 15, y_1 = 20, k$ rimane 300). Il punto si muove lungo la curva mantenendo il prodotto costante.](images/lezione-27-applicazioni-reali-con-smart-contracts-img-01.jpg)
 
 L'intuizione è immediata: più un asset diventa scarso nella pool (il suo $x$ o $y$ diminuisce), più il suo prezzo aumenta. Non c'è order book, non ci sono trader umani: solo matematica, liquidità e smart contract.
 
@@ -982,8 +964,7 @@ Per una curva $\psi(x, y) = \text{costante}$, il prezzo istantaneo di Y in termi
 
 $$P_{Y/X} = \frac{dY}{dX} = \frac{y}{x}$$
 
-![Prezzo istantaneo nell'AMM: slope della tangente alla curva xy=k](images/lezione-27-applicazioni-reali-con-smart-contracts-img-02.jpg)
-*Fig. — Il prezzo istantaneo di Y è il rapporto $y/x$, ovvero la pendenza della tangente alla curva $\psi(x,y) = \text{costante}$ nel punto corrente.*
+![Il prezzo istantaneo di Y è il rapporto $y/x$, ovvero la pendenza della tangente alla curva $\psi(x,y) = \text{costante}$ nel punto corrente.](images/lezione-27-applicazioni-reali-con-smart-contracts-img-02.jpg)
 
 ##### Variazioni di $k$
 
@@ -1021,8 +1002,7 @@ Prima di essere confermate on-chain, le transazioni rimangono visibili nel **mem
 > 2. **Vittima** ($T_V$): acquista l'asset a prezzo ormai più alto, subendo slippage sfavorevole.
 > 3. **Back-run** ($T_{A_2}$, gas price **più basso** di $T_V$): vende l'asset al prezzo gonfiato dalla transazione della vittima, intascando il profitto.
 
-![Sandwich attack: T_A1 inserita prima di T_V, T_A2 inserita dopo nel blocco](images/lezione-27-applicazioni-reali-con-smart-contracts-img-03.jpg)
-*Fig. — Il sandwich attack: $T_{A_1}$ (front-run) e $T_{A_2}$ (back-run) circondano $T_V$ (vittima) nel blocco proposto. I miner includono nell'ordine corretto grazie al differenziale di gas price.*
+![Il sandwich attack: $T_{A_1}$ (front-run) e $T_{A_2}$ (back-run) circondano $T_V$ (vittima) nel blocco proposto. I miner includono nell'ordine corretto grazie al differenziale di gas price.](images/lezione-27-applicazioni-reali-con-smart-contracts-img-03.jpg)
 
 #### MEV — Maximum Extractable Value
 

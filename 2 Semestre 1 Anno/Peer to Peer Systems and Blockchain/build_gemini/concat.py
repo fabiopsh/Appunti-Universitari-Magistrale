@@ -92,7 +92,7 @@ def dedupe_progetto(paths):
     return sorted(by_key.values())
 
 
-lessons = dedupe_by_lesson_number(SRC.glob("Lezione*.md"))
+lessons = sorted(SRC.glob("Capitolo*.md"))
 
 parts = []
 for p in lessons:

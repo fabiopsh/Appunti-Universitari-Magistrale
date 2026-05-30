@@ -86,8 +86,7 @@ Le funzioni base non garantiscono hiding se lo spazio di input è piccolo e prev
 
 **Hash Pointers** — Un hash pointer è sia un riferimento a una posizione (dove si trova il dato) sia un hash crittografico del dato in quella posizione. Permette di verificare che i dati non siano stati alterati. Bitcoin usa una **hash chain** (blockchain) per memorizzare il ledger delle transazioni: ogni blocco contiene l'hash del blocco precedente, garantendo la *tamper-freeness* — modificare un blocco invalida tutti i successivi.
 
-![Struttura a blocchi collegati tramite hash crittografico](images/blockchain_structure.png)
-*Figura 1: Concetto di Blockchain. Ogni blocco contiene un riferimento crittografico (hash) al blocco precedente, creando una catena immutabile in cui alterare un blocco invaliderebbe tutti i successivi.*
+![Concetto di Blockchain. Ogni blocco contiene un riferimento crittografico (hash) al blocco precedente, creando una catena immutabile in cui alterare un blocco invaliderebbe tutti i successivi.](images/blockchain_structure.png)
 
 **Commitment Scheme** — Permette di "chiudere in una busta" una decisione senza terze parti fidate.
 
@@ -322,8 +321,8 @@ Con $n$ dati $x_1, x_2, \ldots, x_n$ e funzione hash $H$:
 - Il commitment finale è il Merkle Root $y_{2n-1}$
 - **Costo di costruzione**: $O(n)$ spazio e $O(n)$ hash
   
-![Albero di Merkle: struttura ad albero binario basata su hash crittografici](images/Pasted-image-20260407112004.png)
-*Figura 2: Albero di Merkle. I dati originali si trovano nelle foglie ($x_1 \ldots x_8$). Ogni nodo intermedio è calcolato come l'hash della concatenazione dei suoi nodi figli, fino alla Root ($y_{15}$).*
+
+![Albero di Merkle. I dati originali si trovano nelle foglie ($x_1 \ldots x_8$). Ogni nodo intermedio è calcolato come l'hash della concatenazione dei suoi nodi figli, fino alla Root ($y_{15}$).](images/Pasted-image-20260407112004.png)
 
 #### Merkle Proof (Proof of Inclusion)
 

@@ -28,7 +28,7 @@ def slugify(name: str) -> str:
 total_imgs = 0
 per_file_counts = {}
 
-for md_file in sorted(ROOT.glob("*.md")):
+for md_file in sorted(OUT_MD.glob("*.md")):
     text = md_file.read_text(encoding="utf-8")
     slug = slugify(md_file.stem)
     counter = {"n": 0}
@@ -53,7 +53,7 @@ for md_file in sorted(ROOT.glob("*.md")):
         return f"![{alt}](images/{fname})"
 
     new_text = DATA_URI_RE.sub(repl, text)
-    (OUT_MD / md_file.name).write_text(new_text, encoding="utf-8")
+    md_file.write_text(new_text, encoding="utf-8")
     if counter["n"] > 0:
         per_file_counts[md_file.name] = counter["n"]
         total_imgs += counter["n"]

@@ -191,8 +191,7 @@ L'attacco diventa pericoloso in modalità **stealth**. Il minatore malevolo:
 3. Quando la catena privata supera quella pubblica, la trasmette alla rete
 4. Per la Longest Chain Rule, la rete adotta la nuova catena: l'attaccante riottiene i fondi e mantiene il bene
 
-![Schema dell'attacco stealth di Double Spending (51% Attack)](images/Pasted-image-20260319164820.png)
-*Figura: Schema dell'attacco stealth di Double Spending (51% Attack).*
+![Schema dell'attacco stealth di Double Spending (51% Attack).](images/Pasted-image-20260319164820.png)
 
 Perché l'attacco riesca con regolarità, il minatore deve detenere oltre il **50% dell'hashing power** — da qui il nome "51% Attack".
 
@@ -310,8 +309,7 @@ Un **protocol fork** (*fork di protocollo*) nasce da un cambiamento deliberato n
 
 Un **chain fork** (*fork di catena*) è invece un fenomeno temporaneo e fisiologico. Accade quando due miner trovano un blocco valido quasi contemporaneamente, oppure a causa della latenza di rete o di un attacco (come discusso precedentemente per i fork temporanei). Si creano così più blocchi validi alla stessa altezza. La rete risolve l'ambiguità applicando la **longest chain rule** (la regola della catena con più lavoro cumulativo): uno dei rami diventa orfano e i suoi blocchi vengono scartati. Non cambia nessuna regola, non nasce nessun nuovo asset. È un evento normale nell'operatività quotidiana di Bitcoin.
 
-![Confronto visivo Hard Fork vs Soft Fork: chain splits, backward compatibility](images/lezione-18-hard-and-soft-forks-in-bitcoin-img-01.jpg)
-*Fig. — Hard fork vs soft fork a confronto: il primo divide la rete in due catene separate, il secondo mantiene la rete unita con regole più restrittive.*
+![Hard fork vs soft fork a confronto: il primo divide la rete in due catene separate, il secondo mantiene la rete unita con regole più restrittive.](images/lezione-18-hard-and-soft-forks-in-bitcoin-img-01.jpg)
 
 > [!tip] Intuizione chiave
 >
@@ -339,8 +337,7 @@ Il processo funziona così: i miner consapevoli delle nuove regole segnalano sup
 
 Dopo un soft fork, se la maggioranza della potenza di hashing adotta le nuove regole, la versione legacy sparisce gradualmente. Il motivo è puramente economico: i blocchi prodotti dai nodi non aggiornati vengono rifiutati dalla maggioranza dei nodi aggiornati. I miner non vogliono sprecare potenza computazionale producendo blocchi che la rete scarterà, quindi migrano alla nuova versione per continuare a ricevere ricompense.
 
-![Diagramma "Adapting to the New Consensus": i vecchi miner abbandonano la catena rifiutata e migrano a quella valida](images/lezione-18-hard-and-soft-forks-in-bitcoin-img-02.jpg)
-*Fig. — Come la vecchia versione muore: i blocchi dei nodi non aggiornati vengono rifiutati dalla catena dominante. I miner seguono "the chain that pays".*
+![Come la vecchia versione muore: i blocchi dei nodi non aggiornati vengono rifiutati dalla catena dominante. I miner seguono "the chain that pays".](images/lezione-18-hard-and-soft-forks-in-bitcoin-img-02.jpg)
 
 I possibili esiti di un soft fork sono tre: tutti i miner accettano e il fork è semplicemente un aggiornamento software; la maggioranza accetta, la nuova versione si consolida e quella vecchia muore gradualmente; la maggioranza rifiuta e il fork non sopravvive.
 
@@ -348,8 +345,7 @@ I possibili esiti di un soft fork sono tre: tutti i miner accettano e il fork è
 
 Prima di analizzare SegWit e Taproot nel dettaglio, è utile avere una visione d'insieme dei soft fork che hanno caratterizzato la storia di Bitcoin.
 
-![Timeline dei principali soft fork Bitcoin: P2SH (2012), CSV (2015), SegWit (2017), CLTV (2017), Taproot (2021)](images/lezione-18-hard-and-soft-forks-in-bitcoin-img-03.jpg)
-*Fig. — Timeline dei soft fork principali di Bitcoin: da P2SH (2012) per il multisig, a SegWit (2017) per la scalabilità, fino a Taproot (2021) per la privacy.*
+![Timeline dei soft fork principali di Bitcoin: da P2SH (2012) per il multisig, a SegWit (2017) per la scalabilità, fino a Taproot (2021) per la privacy.](images/lezione-18-hard-and-soft-forks-in-bitcoin-img-03.jpg)
 
 ### SegWit — Agosto 2017
 
@@ -373,8 +369,7 @@ Il txid cambiato rendeva inoltre impossibile per altri protocolli — come la Li
 
 SegWit risolve il problema spostando i dati delle firme fuori dalla struttura principale della transazione, in una sezione separata chiamata **Witness** (*testimone*). Poiché il txid viene ora calcolato senza i dati della firma, non può più essere alterato dopo che la transazione è stata firmata.
 
-![Struttura della transazione pre-SegWit vs post-SegWit: le firme vengono spostate nel Witness separato](images/lezione-18-hard-and-soft-forks-in-bitcoin-img-04.jpg)
-*Fig. — Confronto strutturale: nel blocco Pre-SegWit le firme sono embedded nella transazione; nel blocco SegWit la Witness Data è segregata e non influisce sul calcolo del txid.*
+![Confronto strutturale: nel blocco Pre-SegWit le firme sono embedded nella transazione; nel blocco SegWit la Witness Data è segregata e non influisce sul calcolo del txid.](images/lezione-18-hard-and-soft-forks-in-bitcoin-img-04.jpg)
 
 I benefici sono: eliminazione della manipolazione del txid, transazioni non confermate più sicure, e l'abilitazione della Lightning Network.
 
@@ -386,15 +381,13 @@ I benefici sono: eliminazione della manipolazione del txid, transazioni non conf
 
 Anche se non era l'obiettivo primario, SegWit ha aumentato de facto la capacità di transazione. Prima di SegWit i blocchi erano limitati a 1 MB. SegWit introduce il concetto di **block weight** (*peso del blocco*): i byte normali di una transazione contano 4 unità di peso ciascuno, mentre i byte del Witness contano solo 1 unità di peso. Il limite massimo è 4 milioni di unità di peso. Questo significa che blocchi con molte transazioni SegWit possono contenere più dati totali, pur rimanendo entro il limite di peso — effettivamente aumentando il throughput.
 
-![Confronto blocco legacy vs blocco SegWit: la Witness Area permette capacità extra separata dalla base data](images/lezione-18-hard-and-soft-forks-in-bitcoin-img-05.jpg)
-*Fig. — In un blocco SegWit la Witness Area (tratteggiata) contiene le firme a peso ridotto. La base data rimane ≤ 1 MB per i vecchi nodi, ma il blocco reale può superarla.*
+![In un blocco SegWit la Witness Area (tratteggiata) contiene le firme a peso ridotto. La base data rimane ≤ 1 MB per i vecchi nodi, ma il blocco reale può superarla.](images/lezione-18-hard-and-soft-forks-in-bitcoin-img-05.jpg)
 
 #### SegWit: Ricapitolazione
 
 Il diagramma seguente riassume in modo completo il funzionamento di SegWit, evidenziando come i vecchi nodi vedano solo la parte base del blocco (≤ 1 MB) e ignorino la witness, mantenendo la retrocompatibilità.
 
-![SegWit Recap: confronto Legacy Block vs SegWit Block con indicazione di cosa vedono i vecchi nodi e i nuovi nodi](images/lezione-18-hard-and-soft-forks-in-bitcoin-img-06.jpg)
-*Fig. — Ricapitolazione SegWit: il blocco legacy ha firme inline; il blocco SegWit le separa nel Witness. I vecchi nodi vedono solo la base data e rimangono sincronizzati.*
+![Ricapitolazione SegWit: il blocco legacy ha firme inline; il blocco SegWit le separa nel Witness. I vecchi nodi vedono solo la base data e rimangono sincronizzati.](images/lezione-18-hard-and-soft-forks-in-bitcoin-img-06.jpg)
 
 ### Taproot — Novembre 2021
 
@@ -418,8 +411,7 @@ Le Schnorr Signatures hanno cinque proprietà fondamentali:
 
 **Sicurezza dimostrabile**: la sicurezza è riducibile formalmente al problema del logaritmo discreto.
 
-![Schema di aggregazione Schnorr: tre firmatari (P1, P2, P3) producono chiave e firma aggregate verificabili come una sola](images/lezione-18-hard-and-soft-forks-in-bitcoin-img-07.jpg)
-*Fig. — Key aggregation con Schnorr: P1, P2, P3 combinano chiavi e firme in un'unica $P_{agg}$ e $S_{agg}$. La verifica è identica a quella di un firmatario singolo.*
+![Key aggregation con Schnorr: P1, P2, P3 combinano chiavi e firme in un'unica $P_{agg}$ e $S_{agg}$. La verifica è identica a quella di un firmatario singolo.](images/lezione-18-hard-and-soft-forks-in-bitcoin-img-07.jpg)
 
 Le Schnorr Signatures producono una singola chiave pubblica e una singola firma, anche quando più firmatari cooperano. Il processo richiede cooperazione interattiva tra i firmatari, incluso lo scambio di chiavi pubbliche e la coordinazione del processo di firma.
 
@@ -435,15 +427,13 @@ Il problema che MAST risolve è il seguente: uno script Bitcoin può prevedere m
 
 L'**Abstract Syntax Tree** specifica come suddividere la logica di spesa in foglie. Le condizioni in relazione OR diventano foglie separate — se basta soddisfarne una, non ha senso includerle tutte. Le condizioni in relazione AND rimangono nella stessa foglia, perché devono essere soddisfatte insieme.
 
-![Trasformazione da Abstract Syntax Tree (AST) a Merkelized AST (MAST): le condizioni OR diventano foglie separate, le AND rimangono nella stessa foglia](images/lezione-18-hard-and-soft-forks-in-bitcoin-img-08.jpg)
-*Fig. — Da AST a MAST: le condizioni OR (2-of-3 Multisig, Timelock) diventano foglie separate; le condizioni AND (Timelock AND Hash Preimage) rimangono nella stessa foglia.*
+![Da AST a MAST: le condizioni OR (2-of-3 Multisig, Timelock) diventano foglie separate; le condizioni AND (Timelock AND Hash Preimage) rimangono nella stessa foglia.](images/lezione-18-hard-and-soft-forks-in-bitcoin-img-08.jpg)
 
 **La Parte Merkle Tree**
 
 Una volta strutturate le condizioni come foglie, si costruisce un Merkle Tree su di esse. La radice del Merkle Tree impegna crittograficamente tutte le condizioni. Quando si spende, si rivela solo la foglia usata e il percorso di verifica (Merkle proof), non le altre condizioni.
 
-![Struttura Merkle Tree del MAST con quattro condizioni di spesa: Hashlock, Timelock ≤3 mesi, 2-of-3 Multisig, Single Signature](images/lezione-18-hard-and-soft-forks-in-bitcoin-img-09.jpg)
-*Fig. — Il Merkle Tree del MAST: ogni condizione di spesa è una foglia. La MAST ROOT impegna tutte le condizioni. Al momento della spesa si rivela solo la foglia usata + il Merkle path.*
+![Il Merkle Tree del MAST: ogni condizione di spesa è una foglia. La MAST ROOT impegna tutte le condizioni. Al momento della spesa si rivela solo la foglia usata + il Merkle path.](images/lezione-18-hard-and-soft-forks-in-bitcoin-img-09.jpg)
 
 > [!example] MAST con 4 condizioni di spesa
 >
@@ -473,8 +463,7 @@ P' = P + t \cdot G
 $$
 Il risultato $P'$ è la **tweaked public key**: una nuova chiave pubblica che impegna crittograficamente sia la chiave interna $P$ che l'intero albero di script $m$.
 
-![Schema concettuale tweaked key: Original Public Key + Secret Script producono una Tweaked Key che sembra normale ma ha condizioni nascoste](images/lezione-18-hard-and-soft-forks-in-bitcoin-img-10.jpg)
-*Fig. — La tweaked key: combina la chiave pubblica originale con lo script segreto (MAST root) in un'unica chiave che appare normale on-chain ma impegna crittograficamente le condizioni di spesa.*
+![La tweaked key: combina la chiave pubblica originale con lo script segreto (MAST root) in un'unica chiave che appare normale on-chain ma impegna crittograficamente le condizioni di spesa.](images/lezione-18-hard-and-soft-forks-in-bitcoin-img-10.jpg)
 
 > [!tip] Cosa viene scritto on-chain
 >
@@ -486,13 +475,11 @@ Taproot prevede due modalità di spesa:
 
 **Key path spending** (*spesa via chiave*): se tutte le parti coinvolte sono d'accordo, producono una firma Schnorr aggregata valida per $P'$. Nessuno script viene rivelato. Dall'esterno sembra una semplice transazione a firma singola, anche se in realtà ci sono molteplici condizioni possibili. Questo è il caso "felice" e più privato.
 
-![Taproot key path spending: on-chain output con P' (tweaked), firma aggregata di Alice+Bob+Charlie, verifica come singola firma Schnorr](images/lezione-18-hard-and-soft-forks-in-bitcoin-img-11.jpg)
-*Fig. — Key path spending: tutti i partecipanti cooperano, producono una firma Schnorr aggregata. Il nodo verifica $\text{sig}$ rispetto a $P'$. Indistinguibile da una transazione standard.*
+![Key path spending: tutti i partecipanti cooperano, producono una firma Schnorr aggregata. Il nodo verifica $\text{sig}$ rispetto a $P'$. Indistinguibile da una transazione standard.](images/lezione-18-hard-and-soft-forks-in-bitcoin-img-11.jpg)
 
 **Script path spending** (*spesa via script*): se le parti non possono usare la key path (es. una parte non è disponibile), si rivela la foglia dello script desiderato e la Merkle proof che dimostra che quella foglia era nell'albero. Le condizioni alternative rimangono nascoste.
 
-![Taproot script path spending: reveal script + Merkle path, produzione firme matching lo script, verifica con controllo condizioni specifiche](images/lezione-18-hard-and-soft-forks-in-bitcoin-img-12.jpg)
-*Fig. — Script path spending: si rivela lo script specifico (tapleaf) e il Merkle path verso la root. Si producono le firme/dati richiesti dallo script. Le altre condizioni rimangono private.*
+![Script path spending: si rivela lo script specifico (tapleaf) e il Merkle path verso la root. Si producono le firme/dati richiesti dallo script. Le altre condizioni rimangono private.](images/lezione-18-hard-and-soft-forks-in-bitcoin-img-12.jpg)
 
 > [!abstract] Sintesi: Taproot
 >
@@ -524,8 +511,7 @@ Gli hard fork sono diventati anche uno strumento strategico per lanciare nuove c
 
 Gli **Altcoin** sono nati così: alcune sono fork di Bitcoin fatte da comunità diverse che volevano seguire un percorso alternativo di sviluppo, altre sono fork nate esplicitamente per creare nuovi asset.
 
-![Diagramma dei fork di Bitcoin nel 2017: Bitcoin Cash (hard fork), SegWit (soft fork), SegWit2x (hard fork), Bitcoin Gold (hard fork)](images/lezione-18-hard-and-soft-forks-in-bitcoin-img-13.jpg)
-*Fig. — I fork di Bitcoin nel 2017: Bitcoin Cash e Bitcoin Gold sono hard fork che generano nuove catene (BCH, BTG); SegWit è il soft fork che mantiene la catena principale; SegWit2x è un tentativo di hard fork abortito (B2X).*
+![I fork di Bitcoin nel 2017: Bitcoin Cash e Bitcoin Gold sono hard fork che generano nuove catene (BCH, BTG); SegWit è il soft fork che mantiene la catena principale; SegWit2x è un tentativo di hard fork abortito (B2X).](images/lezione-18-hard-and-soft-forks-in-bitcoin-img-13.jpg)
 
 #### Hard Fork per Vulnerabilità Crittografiche
 

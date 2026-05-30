@@ -9,8 +9,9 @@ Nel modello **Client-Server** classico i server sono macchine dedicate con IP fi
 > Insieme di entità autonome (**peer**) che si auto-organizzano e condividono risorse distribuite (calcolo, memoria, banda). Il sistema è in grado di adattarsi a un continuo **churn** dei nodi mantenendo connettività e prestazioni ragionevoli senza un'entità centrale. Ogni nodo è contemporaneamente fornitore e consumatore di servizi (funzionalità simmetrica: **servent**).
 
 I server possono esistere per il bootstrap iniziale, ma non sono necessari per lo scambio effettivo delle risorse. Una sfida caratteristica delle reti P2P è il **churn**: i nodi entrano ed escono continuamente, ottenendo spesso un nuovo indirizzo IP ad ogni connessione. Questo rende inutilizzabile l'indirizzamento tramite IP statici e richiede meccanismi applicativi — non a livello IP — per localizzare le risorse.
-![Confronto tra rete Centralizzata (Client-Server) e rete Decentrallizata (Peer-to-Peer)](images/p2p_vs_centralized.png)
-*Figura 1: A sinistra una rete centralizzata con un singolo server (Single Point of Failure), a destra un'architettura Peer-to-Peer totalmente distribuita e interconnessa.*
+
+![A sinistra una rete centralizzata con un singolo server (Single Point of Failure), a destra un'architettura Peer-to-Peer totalmente distribuita e interconnessa.](images/p2p_vs_centralized.png)
+
 Ogni peer che partecipa a una rete P2P deve affrontare quattro problemi fondamentali: come **unirsi** alla rete (*join*), come **scoprire altri peer** (*peer discovery*), come comportarsi sia da fornitore che da consumatore di servizi, e come **prevenire il free riding** — ovvero impedire che alcuni nodi consumino risorse senza contribuire — incentivando la partecipazione e la reciprocità.
 
 ### Condivisione di Risorse
@@ -103,8 +104,8 @@ La seconda generazione (**Gnutella, Kazaa, BitTorrent**) ha eliminato ogni punto
 >
 > Rete logica costruita sopra la rete fisica sottostante (underlay), tipicamente a livello applicativo sopra TCP/IP. I link dell'overlay sono "tunnel" che attraversano la rete fisica: un singolo collegamento logico può passare per decine di router. Più overlay possono coesistere contemporaneamente sulla stessa rete fisica, ciascuno offrendo il proprio servizio specifico non disponibile nell'underlay. I nodi dell'overlay sono spesso end host che fungono anche da nodi intermedi che inoltrano traffico.
 
-![Livello Overlay P2P sovrapposto al livello Underlay (rete IP nativa)](images/Pasted-image-20260407110328.png)
-*Figura 2: Rappresentazione dei due livelli di rete. L'Overlay logico (in alto) è costruito creando connessioni virtuali tra i peer, che fisicamente si traducono in percorsi complessi attraverso l'Underlay IP (in basso).*
+![Rappresentazione dei due livelli di rete. L'Overlay logico (in alto) è costruito creando connessioni virtuali tra i peer, che fisicamente si traducono in percorsi complessi attraverso l'Underlay IP (in basso).](images/Pasted-image-20260407110328.png)
+
 Un protocollo P2P definisce formato e semantica dei messaggi tra peer. I peer sono identificati da ID univoci, generalmente calcolati tramite funzioni hash. I pacchetti P2P, analogamente ai pacchetti IP, sono caratterizzati da un **header** e un **payload**. Il protocollo definisce anche una strategia di routing a livello applicativo dello stack TCP/IP, senza dover modificare i router sottostanti.
 
 ### Classificazione degli Overlay
@@ -125,8 +126,9 @@ I peer si connettono arbitrariamente: la topologia forma un grafo casuale (es. G
 ### Bootstrapping e Discovery
 
 Un nuovo nodo non conosce nessuno. Il **bootstrapping** avviene tramite due meccanismi complementari: server DNS noti che memorizzano gli indirizzi IP di un insieme di peer stabili (eseguendo script che interagiscono con i peer e aggiornano automaticamente la lista), oppure una **cache interna** in cui ogni client memorizza gli IP dei peer contattati nelle sessioni correnti e precedenti, aggiornata dinamicamente tramite *gossiping* con i vicini.
-![Processo di Join: un peer interroga un repository e stabilisce link virtuali con peer disponibili](images/Pasted-image-20260407110433.png)
-*Figura 3: Processo di Bootstrap. Il peer in ingresso (azzurro) contatta un repository per ottenere la lista dei descrittori, dopodiché stabilisce le connessioni (link virtuali) con gli altri peer disponibili.*
+
+![Processo di Bootstrap. Il peer in ingresso (azzurro) contatta un repository per ottenere la lista dei descrittori, dopodiché stabilisce le connessioni (link virtuali) con gli altri peer disponibili.](images/Pasted-image-20260407110433.png)
+
 Il processo di partecipazione alla rete si articola in tre fasi:
 
 - **Step 0** — join: il nodo si connette a uno o più peer noti tramite bootstrap.
@@ -241,8 +243,7 @@ La costruzione di una DHT basata su consistent hashing segue tre passi concettua
 Consideriamo uno spazio di identificatori $\{0, \ldots, 15\}$ organizzato come un anello modulo 16, con cinque nodi in posizioni hashate:
 $$H(a) = 6, \quad H(b) = 5, \quad H(c) = 0, \quad H(d) = 11, \quad H(e) = 2$$
 
-![Esempio di anello Chord: i nodi mantengono una finger table logaritmica](images/mermaid-lezione-3-retrieving-content-e-dht-02.png)
-*Figura 4: Topologia ad anello logico di Chord. I nodi sono posizionati sull'anello in base al loro hash. Le frecce indicano i puntatori di routing (finger) che permettono salti di lunghezza esponenzialmente crescente nello spazio degli identificatori.*
+![Topologia ad anello logico di Chord. I nodi sono posizionati sull'anello in base al loro hash. Le frecce indicano i puntatori di routing (finger) che permettono salti di lunghezza esponenzialmente crescente nello spazio degli identificatori.](images/mermaid-lezione-3-retrieving-content-e-dht-02.png)
 
 Il **successore** `succ(x)` è il primo nodo sull'anello con identificatore $\geq x$, procedendo in senso orario. I dati vengono memorizzati sul nodo `succ(k)`, dove $k = H(\text{key})$. 
 
@@ -268,8 +269,7 @@ Se il routing procedesse sequenzialmente sul successore diretto, avremmo $O(N)$ 
 
 L'algoritmo di lookup inoltra la query al finger con l'identificatore massimo che non supera la chiave cercata, dimezzando l'intervallo residuo ad ogni step.
 
-![Flusso di routing in Chord per la risoluzione della chiave k](images/mermaid-lezione-3-retrieving-content-e-dht-03.png)
-*Figura 5: Algoritmo di routing in Chord. La richiesta viene inoltrata iterativamente al nodo conosciuto più distante che non supera la chiave k, avvicinandosi progressivamente (in modo logaritmico) alla destinazione.*
+![Algoritmo di routing in Chord. La richiesta viene inoltrata iterativamente al nodo conosciuto più distante che non supera la chiave k, avvicinandosi progressivamente (in modo logaritmico) alla destinazione.](images/mermaid-lezione-3-retrieving-content-e-dht-03.png)
 
 > [!tip] Scala del miglioramento
 >
@@ -301,8 +301,7 @@ Invece di usare una distanza numerica circolare (come Chord), Kademlia tratta gl
 
 La simmetria è fondamentale: se il nodo A riceve una query da B, B e A sono esattamente alla stessa distanza. Questo significa che A può inserire B nella propria routing table gratuitamente (apprendimento simmetrico), cosa non valida nell'anello asimmetrico di Chord. L'unidirezionalità della XOR garantisce che le ricerche per la stessa chiave convergano sempre sullo stesso percorso.
 
-![Albero binario di Kademlia: organizzazione dello spazio a 160-bit e prefissi condivisi](images/Pasted-image-20260407111031.png)
-*Figura 6: Albero binario dello spazio delle chiavi di Kademlia. Le foglie rappresentano i nodi. Maggiore è la lunghezza del prefisso condiviso tra due nodi (es. `110` e `111`), minore è la loro distanza secondo la metrica XOR.*
+![Albero binario dello spazio delle chiavi di Kademlia. Le foglie rappresentano i nodi. Maggiore è la lunghezza del prefisso condiviso tra due nodi (es. `110` e `111`), minore è la loro distanza secondo la metrica XOR.](images/Pasted-image-20260407111031.png)
 
 ## Routing Table e K-Buckets
 
@@ -315,8 +314,7 @@ Ogni nodo mantiene una routing table divisa in $M$ **K-Buckets**.
 Quando arriva un messaggio, il mittente viene aggiunto in coda se il bucket non è pieno. Se il bucket è pieno, Kademlia esegue un ping al contatto in testa (il più vecchio); se questo risponde, viene mantenuto e il nuovo nodo scartato, altrimenti viene sostituito.
 Questa politica **favorisce i nodi vecchi**, sfruttando l'assunto statistico che i peer connessi da più tempo sono i più affidabili, garantendo anche una forte resistenza agli attacchi DoS (uno spam di nuovi nodi fasulli non spiazzerà i vecchi e stabili).
 
-![Routing Kademlia: suddivisione dello spazio delle chiavi in base alla distanza XOR dal nodo](images/Pasted-image-20260407111152.png)
-*Figura 7: Partizionamento dello spazio degli ID visto dalla prospettiva del nodo rosso. Ogni sotto-albero corrisponde a un "k-bucket" nella routing table del nodo, permettendo di localizzare qualsiasi chiave in $O(\log N)$ salti.*
+![Partizionamento dello spazio degli ID visto dalla prospettiva del nodo rosso. Ogni sotto-albero corrisponde a un "k-bucket" nella routing table del nodo, permettendo di localizzare qualsiasi chiave in $O(\log N)$ salti.](images/Pasted-image-20260407111152.png)
 
 ## Lookup Iterativo e Parallelo
 

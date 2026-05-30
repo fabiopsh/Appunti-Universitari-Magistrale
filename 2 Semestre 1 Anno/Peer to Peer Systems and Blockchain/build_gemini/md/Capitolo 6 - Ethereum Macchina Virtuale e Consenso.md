@@ -65,8 +65,7 @@ Una proprietà cruciale è il **determinismo**: lo smart contract deve produrre 
 
 Prima di analizzare Ethereum, vale la pena fissare il modello di Bitcoin come termine di paragone.
 
-![Diagramma della macchina a stati Bitcoin basata su UTXO](images/lezione-19-ethereum-accounts-transactions-gas-img-02.jpg)
-*Fig. — In Bitcoin lo stato è l'insieme degli UTXO (Unspent Transaction Output). Una transazione consuma degli UTXO esistenti e ne crea di nuovi, generando la transizione S → S'.*
+![In Bitcoin lo stato è l'insieme degli UTXO (Unspent Transaction Output). Una transazione consuma degli UTXO esistenti e ne crea di nuovi, generando la transizione S → S'.](images/lezione-19-ethereum-accounts-transactions-gas-img-02.jpg)
 
 Il saldo disponibile di un utente Bitcoin è la somma dei suoi UTXO. Ogni UTXO esiste una sola volta e viene consumato dalla transazione che lo spende: questo rende impossibile il doppio utilizzo a livello strutturale.
 
@@ -105,8 +104,7 @@ Gli account contratto sono controllati non da una chiave privata, ma dal **codic
 
 Gli account contratto **non hanno chiave privata**: non possono iniziare autonomamente una transazione, ma solo rispondere a transazioni o messaggi ricevuti.
 
-![Schema strutturale degli account Ethereum: EOA e Contract Account a confronto](images/lezione-19-ethereum-accounts-transactions-gas-img-03.jpg)
-*Fig. — Confronto strutturale tra EOA e Contract Account. L'EOA usa una chiave privata per firmare transazioni e ne deriva l'indirizzo con Keccak-256; il Contract Account espone bytecode EVM e storage persistente. Entrambi condividono lo spazio di indirizzamento a 20 byte (160 bit).*
+![Confronto strutturale tra EOA e Contract Account. L'EOA usa una chiave privata per firmare transazioni e ne deriva l'indirizzo con Keccak-256; il Contract Account espone bytecode EVM e storage persistente. Entrambi condividono lo spazio di indirizzamento a 20 byte (160 bit).](images/lezione-19-ethereum-accounts-transactions-gas-img-03.jpg)
 
 > [!warning] Generazione degli indirizzi
 >
@@ -115,8 +113,7 @@ Gli account contratto **non hanno chiave privata**: non possono iniziare autonom
 
 La tabella seguente riassume le differenze operative:
 
-![Tabella di confronto tra EOA e Contract Account per caratteristiche](images/lezione-19-ethereum-accounts-transactions-gas-img-04.jpg)
-*Fig. — Confronto delle capacità: solo gli EOA possono inviare transazioni firmate; solo i Contract Account hanno codice e storage. I contratti possono inviare messaggi (non transazioni firmate) ad altri contratti e crearne di nuovi.*
+![Confronto delle capacità: solo gli EOA possono inviare transazioni firmate; solo i Contract Account hanno codice e storage. I contratti possono inviare messaggi (non transazioni firmate) ad altri contratti e crearne di nuovi.](images/lezione-19-ethereum-accounts-transactions-gas-img-04.jpg)
 
 ---
 
@@ -132,8 +129,7 @@ Qualsiasi azione sulla blockchain Ethereum è sempre **avviata da una transazion
 
 La forma più semplice di transazione trasferisce Ether da un EOA a un altro, funzionalmente analoga a una transazione Bitcoin — ma basata su account, non su UTXO.
 
-![Formato della transazione EOA-to-EOA: campi signature, to, amount](images/lezione-19-ethereum-accounts-transactions-gas-img-05.jpg)
-*Fig. — Formato della transazione EOA→EOA. I campi principali: `signature` (firma ECDSA del mittente), `to` (indirizzo del destinatario a 20 byte), `amount` (valore in wei).*
+![Formato della transazione EOA→EOA. I campi principali: `signature` (firma ECDSA del mittente), `to` (indirizzo del destinatario a 20 byte), `amount` (valore in wei).](images/lezione-19-ethereum-accounts-transactions-gas-img-05.jpg)
 
 ### Il nonce della transazione
 
@@ -161,13 +157,11 @@ La soluzione di Ethereum è il nonce: ogni transazione deve includere il nonce c
 
 ### Transizione semplice EOA→EOA
 
-![Esempio di transizione di stato tra EOA: Alice invia 10 ETH a Bob](images/lezione-19-ethereum-accounts-transactions-gas-img-06.jpg)
-*Fig. — Transizione di stato EOA→EOA. Alice (50 ETH, nonce 5) invia 10 ETH a Bob (30 ETH). Lo stato S' vede Alice a 40 ETH (nonce 6) e Bob a 40 ETH. Se il saldo fosse insufficiente (es. Alice=50, Bob=30, send 70) la funzione APPLY restituisce ERROR.*
+![Transizione di stato EOA→EOA. Alice (50 ETH, nonce 5) invia 10 ETH a Bob (30 ETH). Lo stato S' vede Alice a 40 ETH (nonce 6) e Bob a 40 ETH. Se il saldo fosse insufficiente (es. Alice=50, Bob=30, send 70) la funzione APPLY restituisce ERROR.](images/lezione-19-ethereum-accounts-transactions-gas-img-06.jpg)
 
 ### Transizione con Smart Contract
 
-![Esempio di transizione di stato con smart contract che aggiorna il proprio storage](images/lezione-19-ethereum-accounts-transactions-gas-img-07.jpg)
-*Fig. — Transizione di stato con contract account. Il mittente invia una transazione con value 10 e data "CHARLIE" al contratto. Il contratto aggiorna il proprio storage (la lista diventa [ALICE, BOB, CHARLIE]) e i saldi vengono aggiornati di conseguenza.*
+![Transizione di stato con contract account. Il mittente invia una transazione con value 10 e data "CHARLIE" al contratto. Il contratto aggiorna il proprio storage (la lista diventa [ALICE, BOB, CHARLIE]) e i saldi vengono aggiornati di conseguenza.](images/lezione-19-ethereum-accounts-transactions-gas-img-07.jpg)
 
 ---
 
@@ -175,15 +169,13 @@ La soluzione di Ethereum è il nonce: ogni transazione deve includere il nonce c
 
 Uno smart contract attraversa tre fasi principali:
 
-![Diagramma del ciclo di vita di uno smart contract: Creation, Interaction, Destruction](images/lezione-19-ethereum-accounts-transactions-gas-img-08.jpg)
-*Fig. — Il lifecycle di uno smart contract è una progressione lineare: Creazione → Interazione → Distruzione (opzionale).*
+![Il lifecycle di uno smart contract è una progressione lineare: Creazione → Interazione → Distruzione (opzionale).](images/lezione-19-ethereum-accounts-transactions-gas-img-08.jpg)
 
 ### Creazione
 
 Solo un EOA può creare (fare il *deploy* di) uno smart contract sulla blockchain. La creazione avviene tramite una transazione speciale in cui il campo `to` è **vuoto** (nessun indirizzo di destinazione finché il contratto non è deployato), e il campo `data` contiene il **bytecode compilato** del contratto.
 
-![Formato della transazione di creazione contratto: campo to vuoto, data con bytecode](images/lezione-19-ethereum-accounts-transactions-gas-img-09.jpg)
-*Fig. — Transazione di creazione: il campo `to` è vuoto (l'indirizzo del contratto viene generato al deploy), il campo `data` contiene il bytecode EVM del contratto.*
+![Transazione di creazione: il campo `to` è vuoto (l'indirizzo del contratto viene generato al deploy), il campo `data` contiene il bytecode EVM del contratto.](images/lezione-19-ethereum-accounts-transactions-gas-img-09.jpg)
 
 ### Interazione
 
@@ -191,8 +183,7 @@ Una volta deployato, il contratto può essere invocato da:
 - un **EOA** tramite una transazione che specifica l'indirizzo del contratto e il metodo da chiamare,
 - un **altro contratto** tramite un messaggio interno (non una transazione firmata).
 
-![Formato della transazione di interazione con un contratto: to=indirizzo contratto, data=metodo+parametri](images/lezione-19-ethereum-accounts-transactions-gas-img-10.jpg)
-*Fig. — Transazione di interazione: `to` contiene l'indirizzo del contratto, `data` codifica il metodo da invocare tramite function selector (primi 4 byte del Keccak-256 del prototipo della funzione) + argomenti ABI-encoded.*
+![Transazione di interazione: `to` contiene l'indirizzo del contratto, `data` codifica il metodo da invocare tramite function selector (primi 4 byte del Keccak-256 del prototipo della funzione) + argomenti ABI-encoded.](images/lezione-19-ethereum-accounts-transactions-gas-img-10.jpg)
 
 > [!note] Contract-to-Contract
 >
@@ -242,8 +233,7 @@ Questo semplice contratto di crowdfunding mostra i meccanismi fondamentali di So
 
 Ogni transazione Ethereum include i seguenti campi, serializzati con lo schema **RLP** (*Recursive Length Prefix*):
 
-![Schema UML del formato completo di una transazione Ethereum](images/lezione-19-ethereum-accounts-transactions-gas-img-11.jpg)
-*Fig. — Struttura completa di una transazione Ethereum: nonce, gasLimit, gasPrice, to, value, i tre componenti della firma ECDSA (v, r, s), e data.*
+![Struttura completa di una transazione Ethereum: nonce, gasLimit, gasPrice, to, value, i tre componenti della firma ECDSA (v, r, s), e data.](images/lezione-19-ethereum-accounts-transactions-gas-img-11.jpg)
 
 | Campo | Descrizione |
 |-------|-------------|
@@ -308,25 +298,21 @@ Se al termine dell'esecuzione rimane del gas inutilizzato, viene **rimborsato** 
 
 ### Ether e le sue denominazioni
 
-![Tabella delle denominazioni dell'Ether: da wei a Megaether](images/lezione-19-ethereum-accounts-transactions-gas-img-12.jpg)
-*Fig. — Le denominazioni dell'Ether, ciascuna intitolata a un pioniere dell'informatica: wei (unità base), Babbage (10³), Lovelace (10⁶), Shannon (10⁹), Szabo (10¹²), Finney (10¹⁵), Ether (10¹⁸), Grand (10²¹), Megaether (10²⁴).*
+![Le denominazioni dell'Ether, ciascuna intitolata a un pioniere dell'informatica: wei (unità base), Babbage (10³), Lovelace (10⁶), Shannon (10⁹), Szabo (10¹²), Finney (10¹⁵), Ether (10¹⁸), Grand (10²¹), Megaether (10²⁴).](images/lezione-19-ethereum-accounts-transactions-gas-img-12.jpg)
 
 L'unità base è il **wei**: 1 ETH = 10¹⁸ wei. Tutte le operazioni interne di Ethereum lavorano in wei.
 
 ### Il meccanismo del Gas: riepilogo
 
-![Diagramma riepilogativo del meccanismo del gas: flusso da TX submission a success/out-of-gas](images/lezione-19-ethereum-accounts-transactions-gas-img-13.jpg)
-*Fig. — Riepilogo del meccanismo gas. Il mittente specifica gasLimit e gasPrice (es. 100.000 gas × 20 Gwei = 0.002 ETH upfront). L'EVM esegue consumando gas. Se successo: gas non usato rimborsato. Se out-of-gas: tutte le modifiche revertite, gas consumato NON rimborsato (deterrente contro spam). In basso: tabella dei costi gas per le istruzioni principali.*
+![Riepilogo del meccanismo gas. Il mittente specifica gasLimit e gasPrice (es. 100.000 gas × 20 Gwei = 0.002 ETH upfront). L'EVM esegue consumando gas. Se successo: gas non usato rimborsato. Se out-of-gas: tutte le modifiche revertite, gas consumato NON rimborsato (deterrente contro spam). In basso: tabella dei costi gas per le istruzioni principali.](images/lezione-19-ethereum-accounts-transactions-gas-img-13.jpg)
 
 ### Costi delle operazioni EVM
 
 Il costo in gas di ogni istruzione è fisso e definito nel Yellow Paper di Ethereum. Le operazioni di storage sono di gran lunga le più costose.
 
-![Tabella dei costi gas delle operazioni EVM di base](images/lezione-19-ethereum-accounts-transactions-gas-img-14.jpg)
-*Fig. — Costi gas per operazioni di base: ADD/SUB (3 gas), MUL/DIV (5 gas), ADDMOD/MULMOD (8 gas), operazioni bitwise/confronto (3 gas), operazioni stack POP (2), PUSH/DUP/SWAP (3), MLOAD/MSTORE (3).*
+![Costi gas per operazioni di base: ADD/SUB (3 gas), MUL/DIV (5 gas), ADDMOD/MULMOD (8 gas), operazioni bitwise/confronto (3 gas), operazioni stack POP (2), PUSH/DUP/SWAP (3), MLOAD/MSTORE (3).](images/lezione-19-ethereum-accounts-transactions-gas-img-14.jpg)
 
-![Tabella dei costi gas per operazioni avanzate: JUMP, storage, CREATE, CALL](images/lezione-19-ethereum-accounts-transactions-gas-img-15.jpg)
-*Fig. — Costi gas per operazioni avanzate: JUMP (8), JUMPI (10), SLOAD (200), SSTORE (20.000), BALANCE (400), CREATE (32.000), CALL (25.000). Lo storage è deliberatamente costoso per scoraggiare l'uso eccessivo della chain come database.*
+![Costi gas per operazioni avanzate: JUMP (8), JUMPI (10), SLOAD (200), SSTORE (20.000), BALANCE (400), CREATE (32.000), CALL (25.000). Lo storage è deliberatamente costoso per scoraggiare l'uso eccessivo della chain come database.](images/lezione-19-ethereum-accounts-transactions-gas-img-15.jpg)
 
 ### Gas nei messaggi interni
 
@@ -447,8 +433,7 @@ Quando la quantità di ETH bruciata supera quella emessa come ricompensa ai vali
 
 Ethereum è organizzato in quattro strati funzionali:
 
-![Diagramma Mermaid](images/mermaid-lezione-26-ethereum-2-0-fees-and-tries-01.png)
-*Fig. — I quattro livelli dell'architettura Ethereum.*
+![I quattro livelli dell'architettura Ethereum.](images/mermaid-lezione-26-ethereum-2-0-fees-and-tries-01.png)
 
 Il **Data Layer** comprende le strutture dati che rappresentano lo stato del sistema — account, transazioni, ricevute, storage dei contratti — attraverso strutture ad albero basate su Merkle Patricia Trie.
 
@@ -474,15 +459,13 @@ Dopo il Merge, Ethereum è strutturato in due livelli distinti che collaborano:
 
 Il Consensus Layer gestisce il protocollo di consenso PoS e la validazione. Il suo blocco — il **Beacon Block** — non contiene direttamente transazioni o ricevute, ma include un riferimento al blocco dell'Execution Layer attraverso il campo `execution_payload_header`.
 
-![Beacon Block Header — campi e tipi](images/lezione-26-ethereum-2-0-fees-and-tries-img-01.jpg)
-*Fig. — Struttura del Beacon Block Header: gestisce slot, proposer, state root e il collegamento all'Execution Layer.*
+![Struttura del Beacon Block Header: gestisce slot, proposer, state root e il collegamento all'Execution Layer.](images/lezione-26-ethereum-2-0-fees-and-tries-img-01.jpg)
 
 #### Execution Layer
 
 L'Execution Layer gestisce le transazioni, i contratti intelligenti e i log. Il suo block header è ricco di radici Merkle che certificano lo stato del sistema:
 
-![Execution Layer Block Header — campi e tipi](images/lezione-26-ethereum-2-0-fees-and-tries-img-02.jpg)
-*Fig. — Struttura dell'Execution Layer Block Header: stateRoot, transactionsRoot, receiptsRoot e logsBloom sono le radici dei trie principali.*
+![Struttura dell'Execution Layer Block Header: stateRoot, transactionsRoot, receiptsRoot e logsBloom sono le radici dei trie principali.](images/lezione-26-ethereum-2-0-fees-and-tries-img-02.jpg)
 
 I campi chiave per il Data Layer sono:
 - `stateRoot` → radice del World State Trie
@@ -494,11 +477,9 @@ I campi chiave per il Data Layer sono:
 
 La slide seguente mostra la relazione tra il blocco e i quattro trie principali:
 
-![Diagramma dei trie dell'Execution Layer](images/lezione-26-ethereum-2-0-fees-and-tries-img-03.jpg)
-*Fig. — Il blocco punta tramite radici hash al World State Trie, al Receipts Trie e al Transactions Trie. Il World State Trie punta all'Account Storage Trie per ogni contratto.*
+![Il blocco punta tramite radici hash al World State Trie, al Receipts Trie e al Transactions Trie. Il World State Trie punta all'Account Storage Trie per ogni contratto.](images/lezione-26-ethereum-2-0-fees-and-tries-img-03.jpg)
 
-![Diagramma Mermaid](images/mermaid-lezione-26-ethereum-2-0-fees-and-tries-02.png)
-*Fig. — Relazione tra Block Header e i quattro trie dell'Execution Layer.*
+![Relazione tra Block Header e i quattro trie dell'Execution Layer.](images/mermaid-lezione-26-ethereum-2-0-fees-and-tries-02.png)
 
 > [!note] Quattro trie distinti
 >
@@ -539,8 +520,7 @@ La soluzione è che il contratto **emetta un evento** (`emit`), che viene scritt
 > - **logs**: lista di log entries emesse dal contratto durante l'esecuzione
 > - **logsBloom**: Bloom filter da 2048 bit costruito sulle log entries, per ricerca rapida
 
-![Smart Contract → Transaction Receipt](images/lezione-26-ethereum-2-0-fees-and-tries-img-04.jpg)
-*Fig. — Un contratto Solidity con evento Transfer emette il log quando viene chiamata send(); il log viene registrato nella ricevuta della transazione.*
+![Un contratto Solidity con evento Transfer emette il log quando viene chiamata send(); il log viene registrato nella ricevuta della transazione.](images/lezione-26-ethereum-2-0-fees-and-tries-img-04.jpg)
 
 #### Status
 
@@ -550,8 +530,7 @@ Il campo `status` è 0 o 1. Poiché l'esecuzione è asincrona, il chiamante deve
 
 Il campo `gasUsed` nella ricevuta **non** è il gas consumato dalla singola transazione: è il **totale cumulativo** di tutto il gas utilizzato dalle transazioni dalla prima alla corrente nel blocco, inclusa quest'ultima.
 
-![Schema gas cumulativo per transazione](images/lezione-26-ethereum-2-0-fees-and-tries-img-05.jpg)
-*Fig. — Per la transazione N, gasUsed nella ricevuta e la somma del gas di tutte le transazioni da 1 a N. Nell'esempio, la ricevuta della tx 3 riporta 106.000 gwei = 21.000 + 50.000 + 35.000.*
+![Per la transazione N, gasUsed nella ricevuta e la somma del gas di tutte le transazioni da 1 a N. Nell'esempio, la ricevuta della tx 3 riporta 106.000 gwei = 21.000 + 50.000 + 35.000.](images/lezione-26-ethereum-2-0-fees-and-tries-img-05.jpg)
 
 ### I parametri Indexed e la struttura dei Log
 
@@ -559,15 +538,13 @@ Il campo `gasUsed` nella ricevuta **non** è il gas consumato dalla singola tran
 
 Nei contratti Solidity, i parametri di un evento possono essere dichiarati `indexed`. Questo indica che quei valori devono essere salvati nei **topics** del log (campi indicizzati), anziché nel campo `data` generico.
 
-![Codice Solidity con parametri indexed](images/lezione-26-ethereum-2-0-fees-and-tries-img-06.jpg)
-*Fig. — Nel contratto SimpleToken, from e to sono marcati indexed — vengono salvati nei topics della ricevuta per abilitare ricerche efficienti.*
+![Nel contratto SimpleToken, from e to sono marcati indexed — vengono salvati nei topics della ricevuta per abilitare ricerche efficienti.](images/lezione-26-ethereum-2-0-fees-and-tries-img-06.jpg)
 
 I parametri `indexed` abilitano **ricerche e filtraggio efficienti**: per esempio, trovare tutti i trasferimenti di un token effettuati da un dato indirizzo, oppure tutti i token venduti da un utente. Sono salvati nei campi `topics` della ricevuta, mentre i parametri non-indexed finiscono nel campo `data`.
 
 #### La struttura completa di un evento loggato
 
-![Evento Transfer — struttura completa nella ricevuta](images/lezione-26-ethereum-2-0-fees-and-tries-img-07.jpg)
-*Fig. — A sinistra il contratto Token con l'evento Transfer; a destra la ricevuta con topics (event signature + from + to) e data (amount non-indexed).*
+![A sinistra il contratto Token con l'evento Transfer; a destra la ricevuta con topics (event signature + from + to) e data (amount non-indexed).](images/lezione-26-ethereum-2-0-fees-and-tries-img-07.jpg)
 
 La struttura di un log entry nella ricevuta è:
 - `address`: indirizzo del contratto che ha emesso l'evento
@@ -581,8 +558,7 @@ Cercare tutte le transazioni di un blocco che coinvolgono un certo indirizzo ric
 
 #### LogsBloom nella ricevuta (livello transazione)
 
-![LogsBloom nella ricevuta — Bloom Filter da 2048 bit](images/lezione-26-ethereum-2-0-fees-and-tries-img-08.jpg)
-*Fig. — Per ogni transazione, logsBloom e un Bloom filter costruito sugli indirizzi e i topics dei log con keccak256 e 3 bit impostati nel vettore da 2048 bit.*
+![Per ogni transazione, logsBloom e un Bloom filter costruito sugli indirizzi e i topics dei log con keccak256 e 3 bit impostati nel vettore da 2048 bit.](images/lezione-26-ethereum-2-0-fees-and-tries-img-08.jpg)
 
 Il processo di costruzione:
 1. Per ogni elemento (address o topic) nei log: calcola `keccak256(elemento)`
@@ -591,8 +567,7 @@ Il processo di costruzione:
 
 #### LogsBloom nel block header (livello blocco)
 
-![LogsBloom nel Block Header — OR bitwise di tutti i receipt](images/lezione-26-ethereum-2-0-fees-and-tries-img-09.jpg)
-*Fig. — Il logsBloom del block header e l'OR bitwise dei logsBloom di tutte le ricevute del blocco.*
+![Il logsBloom del block header e l'OR bitwise dei logsBloom di tutte le ricevute del blocco.](images/lezione-26-ethereum-2-0-fees-and-tries-img-09.jpg)
 
 Il `logsBloom` del block header è l'**OR bitwise** dei logsBloom di tutte le ricevute nel blocco. Questo permette una ricerca a due livelli:
 1. Controlla il `logsBloom` del block header: se il bit cercato è 0, il blocco non contiene quell'evento (nessun falso negativo).
@@ -606,15 +581,13 @@ Il `logsBloom` del block header è l'**OR bitwise** dei logsBloom di tutte le ri
 
 #### Il Transaction Receipt Trie
 
-![Transaction Receipt Trie — sequence diagram](images/lezione-26-ethereum-2-0-fees-and-tries-img-10.jpg)
-*Fig. — Il Receipt Trie punta alle ricevute con Gas Used, Logs, Bloom Filter e Status Code. Il sequence diagram mostra l'interazione utente-World State Trie-Receipt Trie durante deploy multipli.*
+![Il Receipt Trie punta alle ricevute con Gas Used, Logs, Bloom Filter e Status Code. Il sequence diagram mostra l'interazione utente-World State Trie-Receipt Trie durante deploy multipli.](images/lezione-26-ethereum-2-0-fees-and-tries-img-10.jpg)
 
 Le ricevute di tutte le transazioni di un blocco sono indicizzate in un MPT. La radice di questo trie è il campo `receiptsRoot` del block header. Quando un utente vuole sapere se una transazione ha avuto successo o vuole recuperare gli eventi emessi, può richiedere una Merkle proof al nodo, senza dover scaricare l'intero blocco.
 
 #### Il Storage Trie
 
-![Storage Trie — lettura/scrittura variabili contratto](images/lezione-26-ethereum-2-0-fees-and-tries-img-11.jpg)
-*Fig. — Il campo storageRoot punta all'Account Storage Trie con uno slot per ogni contratto. Il sequence diagram mostra tre chiamate successive con lookup e aggiornamento del valore.*
+![Il campo storageRoot punta all'Account Storage Trie con uno slot per ogni contratto. Il sequence diagram mostra tre chiamate successive con lookup e aggiornamento del valore.](images/lezione-26-ethereum-2-0-fees-and-tries-img-11.jpg)
 
 Ogni account contratto ha il proprio **Account Storage Trie**, a cui si accede tramite il campo `storageRoot` dello World State Trie. Ogni variabile di stato del contratto occupa uno **slot** nell'albero. Ogni modifica di una variabile di storage aggiorna la radice del trie dell'account, che a sua volta aggiorna la radice dello World State Trie — propagazione tipica della struttura Merkle.
 
@@ -662,11 +635,9 @@ Ethereum nacque con un meccanismo di consenso **Proof of Work**, identico per pr
 
 Nel settembre 2022, con l'evento noto come **The Merge**, la rete è passata al **Proof of Stake**.
 
-![Diagramma del Merge: Ethereum Mainnet e Beacon Chain](images/lezione-19-ethereum-accounts-transactions-gas-img-01.jpg)
-*Fig. — The Merge (settembre 2022): la Ethereum Mainnet (PoW) converge con la Beacon Chain (PoS), attiva in parallelo dal 2020. Da quel momento, il consenso è gestito interamente da PoS.*
+![The Merge (settembre 2022): la Ethereum Mainnet (PoW) converge con la Beacon Chain (PoS), attiva in parallelo dal 2020. Da quel momento, il consenso è gestito interamente da PoS.](images/lezione-19-ethereum-accounts-transactions-gas-img-01.jpg)
 
-![Diagramma Mermaid](images/mermaid-lezione-25-ethereum-consensus-proof-of-stake-01.png)
-*Fig. — Timeline degli upgrade del Consensus Layer di Ethereum 2.0, da Beacon Chain a Deneb.*
+![Timeline degli upgrade del Consensus Layer di Ethereum 2.0, da Beacon Chain a Deneb.](images/mermaid-lezione-25-ethereum-consensus-proof-of-stake-01.png)
 
 La **Beacon Chain** è stata una rete PoS completamente indipendente che ha funzionato in parallelo alla Mainnet Ethereum per quasi due anni. Il suo scopo era supportare la transizione senza interrompere il servizio. **The Merge** del 15 settembre 2022 ha unito la Execution Layer (Mainnet) con la Consensus Layer (Beacon Chain), completando il passaggio da PoW a PoS.
 
@@ -722,8 +693,7 @@ A differenza del PoW, che è un protocollo asincrono senza relazione con il temp
 > - **Slot**: finestra temporale di **12 secondi**, durante la quale un comitato di validatori può votare per un beacon block.
 > - **Epoch**: sequenza di **32 slot** = **6,4 minuti**. In un'epoch, ogni validatore attivo ha esattamente un'opportunità di partecipare.
 
-![Diagramma Mermaid](images/mermaid-lezione-25-ethereum-consensus-proof-of-stake-02.png)
-*Fig. — Struttura temporale di epoch e slot in Ethereum PoS.*
+![Struttura temporale di epoch e slot in Ethereum PoS.](images/mermaid-lezione-25-ethereum-consensus-proof-of-stake-02.png)
 
 All'interno di ogni slot si svolgono tre fasi: (1) un singolo validatore propone un blocco e lo diffonde via gossip; (2) tutti gli altri membri del comitato emettono il loro voto (attestation); (3) negli ultimi 4 secondi, i voti vengono aggregati e inoltrati al proposer del prossimo slot.
 
@@ -737,8 +707,7 @@ Ethereum ha bisogno di casualità verificabile per scegliere i block proposer e 
 
 Il meccanismo segue uno schema commit-reveal in quattro passi:
 
-![Diagramma Mermaid](images/mermaid-lezione-25-ethereum-consensus-proof-of-stake-03.png)
-*Fig. — Il protocollo RANDAO: dalla generazione del segreto all'assegnazione dei ruoli.*
+![Il protocollo RANDAO: dalla generazione del segreto all'assegnazione dei ruoli.](images/mermaid-lezione-25-ethereum-consensus-proof-of-stake-03.png)
 
 Il risultato finale $R = n_1 \oplus n_2 \oplus n_3 \oplus \ldots \oplus n_k$ è imprevedibile perché nessuno conosce tutti i segreti prima della reveal, è inalterabile dopo il commit, è decentralizzato poiché ogni validatore contribuisce, ed è verificabile pubblicamente.
 
@@ -762,8 +731,7 @@ In Ethereum, dove i blocchi vengono prodotti ogni 12 secondi, il tempo di propag
 
 Il peso di un voto è proporzionale al **bilancio effettivo** del validatore al momento del voto: deposito iniziale di 32 ETH, più le ricompense accumulate, meno le penalità subite. Quindi non conta il numero di voti, ma la quantità di ETH in staking che li sostiene.
 
-![Diagramma Mermaid](images/mermaid-lezione-25-ethereum-consensus-proof-of-stake-04.png)
-*Fig. — LMD GHOST: il ramo superiore (60→50→20) vince sul ramo inferiore più lungo (40→30→30→30) perché ha più stake accumulato.*
+![LMD GHOST: il ramo superiore (60→50→20) vince sul ramo inferiore più lungo (40→30→30→30) perché ha più stake accumulato.](images/mermaid-lezione-25-ethereum-consensus-proof-of-stake-04.png)
 
 > [!tip] Intuizione chiave di LMD GHOST
 >
@@ -816,8 +784,7 @@ Il formato di un'attestazione è:
 
 Quando più di $2/3$ del totale dello stake (pesato per bilancio effettivo) vota per lo stesso checkpoint, quel checkpoint diventa **justified**. Il checkpoint della fonte (source) del round precedente diventa a sua volta **finalized**.
 
-![Diagramma Mermaid](images/mermaid-lezione-25-ethereum-consensus-proof-of-stake-05.png)
-*Fig. — Il processo di justification e finalization in Casper FFG: due supermajority consecutive portano C1 alla finalità.*
+![Il processo di justification e finalization in Casper FFG: due supermajority consecutive portano C1 alla finalità.](images/mermaid-lezione-25-ethereum-consensus-proof-of-stake-05.png)
 
 ### Perché Due Supermajority Consecutive Garantiscono la Finalità
 
@@ -863,8 +830,7 @@ Il comportamento dei validatori è regolato da un sistema di incentivi economici
 
 ## Bitcoin vs. Ethereum: confronto finale
 
-![Tabella comparativa tra Ethereum e Bitcoin: caratteristiche principali](images/lezione-19-ethereum-accounts-transactions-gas-img-16.jpg)
-*Fig. — Confronto sistematico tra Ethereum (2015, Vitalik Buterin) e Bitcoin (2009, Satoshi Nakamoto): use case, modello blockchain, consenso, supply, velocità, sicurezza e community.*
+![Confronto sistematico tra Ethereum (2015, Vitalik Buterin) e Bitcoin (2009, Satoshi Nakamoto): use case, modello blockchain, consenso, supply, velocità, sicurezza e community.](images/lezione-19-ethereum-accounts-transactions-gas-img-16.jpg)
 
 | Feature | Ethereum | Bitcoin |
 |---------|----------|---------|
@@ -881,8 +847,7 @@ Il comportamento dei validatori è regolato da un sistema di incentivi economici
 >
 > Ethereum usa [[Kademlia]] come protocollo P2P per la peer discovery, a differenza di Bitcoin che ha sviluppato il proprio protocollo di gossip. Kademlia era già stato studiato nelle lezioni precedenti come DHT efficiente.
 
-![Tabella comparativa Bitcoin vs Ethereum](images/lezione-26-ethereum-2-0-fees-and-tries-img-12.jpg)
-*Fig. — Confronto su 14 dimensioni: anno di lancio, scopo, consenso, block time, supply model, transaction model, smart contracts, fees, use cases, state model e altro.*
+![Confronto su 14 dimensioni: anno di lancio, scopo, consenso, block time, supply model, transaction model, smart contracts, fees, use cases, state model e altro.](images/lezione-26-ethereum-2-0-fees-and-tries-img-12.jpg)
 
 > [!abstract] Differenze strutturali chiave
 >

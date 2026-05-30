@@ -15,8 +15,7 @@ Esistono due tipi di account:
 - **EOA** (*Externally Owned Account*): account controllato da una chiave privata, l'unico che può *iniziare* transazioni autonomamente.
 - **Contract**: account senza chiave privata, il cui comportamento è determinato da bytecode EVM. Viene attivato solo quando riceve una transazione.
 
-![Tabella comparativa EOA vs Contract account in Ethereum](images/lezione-20-lab-solidity-img-01.jpg)
-*Fig. — Confronto tra EOA e Contract: solo l'EOA possiede una chiave privata e paga il gas. Il Contract riceve il proprio indirizzo come hash di sender+nonce alla creazione.*
+![Confronto tra EOA e Contract: solo l'EOA possiede una chiave privata e paga il gas. Il Contract riceve il proprio indirizzo come hash di sender+nonce alla creazione.](images/lezione-20-lab-solidity-img-01.jpg)
 
 ### Campi di ogni account
 
@@ -41,13 +40,11 @@ Lo stato globale di Ethereum è strutturato come una gerarchia di **Merkle Patri
 - **transactionsRoot** — la radice del Transactions Trie, dove la chiave è l'indice della transazione nel blocco (da 0).
 - **receiptsRoot** — la radice del Receipts Trie, che contiene i risultati dell'esecuzione di ogni transazione.
 
-![Struttura del World State Trie con Account State e Account Storage Trie collegati al Block Header](images/lezione-20-lab-solidity-img-02.jpg)
-*Fig. — Il block header punta via hash a tre trie: World State, Receipts e Transactions. L'Account State contiene nonce, balance, storageRoot e codeHash; lo storageRoot punta a sua volta all'Account Storage Trie.*
+![Il block header punta via hash a tre trie: World State, Receipts e Transactions. L'Account State contiene nonce, balance, storageRoot e codeHash; lo storageRoot punta a sua volta all'Account Storage Trie.](images/lezione-20-lab-solidity-img-02.jpg)
 
 La struttura si replica su blocchi successivi: ogni nuovo blocco N+1 condivide i nodi immutati con il blocco N (persistent data structure) e crea nuovi nodi solo per gli account modificati.
 
-![Struttura completa di due blocchi consecutivi con State, Transaction e Receipt Trie condivisi](images/lezione-20-lab-solidity-img-03.jpg)
-*Fig. — I blocchi N e N+1 mostrano come i Merkle Patricia Trie si propaghino tra blocchi: le foglie gialle rappresentano gli account modificati, i nodi condivisi rimangono inalterati.*
+![I blocchi N e N+1 mostrano come i Merkle Patricia Trie si propaghino tra blocchi: le foglie gialle rappresentano gli account modificati, i nodi condivisi rimangono inalterati.](images/lezione-20-lab-solidity-img-03.jpg)
 
 ### Receipt e Bloom filter
 
@@ -122,11 +119,9 @@ Caratteristiche principali:
 
 Lo strumento standard per sviluppare e testare contratti Solidity è **Remix IDE**, accessibile via browser.
 
-![Screenshot di Remix IDE con il contratto Counter deployato e i log delle transazioni](images/lezione-20-lab-solidity-img-04.jpg)
-*Fig. — Remix IDE: pannello di deploy a sinistra, editor con Counter.sol al centro, log delle transazioni in basso. Si vedono le chiamate a `inc`, `dec`, `get` con i rispettivi hash e gas usato.*
+![Remix IDE: pannello di deploy a sinistra, editor con Counter.sol al centro, log delle transazioni in basso. Si vedono le chiamate a `inc`, `dec`, `get` con i rispettivi hash e gas usato.](images/lezione-20-lab-solidity-img-04.jpg)
 
-![Screenshot di Remix IDE con Counter.sol deployato e log delle transazioni](images/lezione-21-lab-solidity-avanzato-img-01.jpg)
-*Fig. — Remix IDE (dettaglio): a sinistra il pannello di deploy, al centro l'editor con Counter.sol, in basso i log delle transazioni con hash, gas usato e valori restituiti.*
+![Remix IDE (dettaglio): a sinistra il pannello di deploy, al centro l'editor con Counter.sol, in basso i log delle transazioni con hash, gas usato e valori restituiti.](images/lezione-21-lab-solidity-avanzato-img-01.jpg)
 
 ### Primo contratto: Counter
 
@@ -139,11 +134,9 @@ Il contratto `Counter` è l'esempio introduttivo classico. Il workflow su Remix:
 5. Chiamare i metodi
 6. Ispezionare le receipt delle transazioni
 
-![Codice del contratto Counter.sol in Solidity](images/lezione-20-lab-solidity-img-05.jpg)
-*Fig. — Il contratto Counter: variabile di stato `uint256 public count`, funzioni `get()` (view), `inc()` e `dec()` (public). La funzione `dec()` fallisce se `count = 0` per underflow aritmetico.*
+![Il contratto Counter: variabile di stato `uint256 public count`, funzioni `get()` (view), `inc()` e `dec()` (public). La funzione `dec()` fallisce se `count = 0` per underflow aritmetico.](images/lezione-20-lab-solidity-img-05.jpg)
 
-![Codice sorgente del contratto Counter.sol](images/lezione-21-lab-solidity-avanzato-img-02.jpg)
-*Fig. — Counter.sol (dettaglio del codice sorgente nell'editor).*
+![Counter.sol (dettaglio del codice sorgente nell'editor).](images/lezione-21-lab-solidity-avanzato-img-02.jpg)
 
 ### Pragma e versioning
 
@@ -626,8 +619,7 @@ Solidity espone due variabili globali che a prima vista sembrano intercambiabili
 
 Un controllo di autorizzazione basato su `tx.origin` è vulnerabile a un classico attacco **man-in-the-middle**: un contratto malevolo può indurre la vittima (che magari è l'owner di un contratto protetto) a interagire con sé, e poi, durante quella stessa transazione, invocare il contratto protetto. A quel punto `tx.origin` è ancora l'indirizzo della vittima (che ha firmato la transazione), quindi il controllo passa, anche se l'effettivo chiamante immediato (`msg.sender`) è il contratto malevolo.
 
-![Diagramma Mermaid](images/mermaid-lezione-23-lab-advanced-solidity-vulnerabilities-e-upgrading-01.png)
-*Fig. — Schema dell'attacco di phishing basato su `tx.origin`: l'EOA della vittima resta `tx.origin` lungo tutta la catena di chiamate, quindi il controllo ingannevole passa nonostante il vero chiamante sia un contratto ostile.*
+![Schema dell'attacco di phishing basato su `tx.origin`: l'EOA della vittima resta `tx.origin` lungo tutta la catena di chiamate, quindi il controllo ingannevole passa nonostante il vero chiamante sia un contratto ostile.](images/mermaid-lezione-23-lab-advanced-solidity-vulnerabilities-e-upgrading-01.png)
 
 > [!warning] Regola pratica
 >
@@ -660,8 +652,7 @@ Il problema è l'**ordine delle operazioni**. La funzione:
 
 Se il chiamante è un contratto il cui fallback chiama di nuovo `withdraw()`, al passo 1 della seconda invocazione il controllo `shares[msg.sender] > 0` passa ancora (le share non sono state azzerate), e il contratto invia di nuovo ether. Il processo si ripete fino a svuotare il contratto o esaurire il gas della transazione.
 
-![Diagramma Mermaid](images/mermaid-lezione-23-lab-advanced-solidity-vulnerabilities-e-upgrading-02.png)
-*Fig. — Il flusso di una reentrancy classica: la chiamata esterna restituisce il controllo al contratto malevolo, che rientra nella funzione prima che lo stato sia aggiornato.*
+![Il flusso di una reentrancy classica: la chiamata esterna restituisce il controllo al contratto malevolo, che rientra nella funzione prima che lo stato sia aggiornato.](images/mermaid-lezione-23-lab-advanced-solidity-vulnerabilities-e-upgrading-02.png)
 
 #### Mitigazioni
 
@@ -728,8 +719,7 @@ Come filo conduttore la lezione usa l'aggiunta di funzionalità di **"proper dea
 
 Esistono due macrofamiglie di soluzioni — quelle **senza proxy** e quelle **con proxy** — per un totale di quattro pattern principali:
 
-![Diagramma Mermaid](images/mermaid-lezione-23-lab-advanced-solidity-vulnerabilities-e-upgrading-03.png)
-*Fig. — Tassonomia delle strategie di upgrading: si parte dalla scelta se introdurre o meno un proxy, e all'interno di ciascuna famiglia si distinguono approcci monolitici e modulari.*
+![Tassonomia delle strategie di upgrading: si parte dalla scelta se introdurre o meno un proxy, e all'interno di ciascuna famiglia si distinguono approcci monolitici e modulari.](images/mermaid-lezione-23-lab-advanced-solidity-vulnerabilities-e-upgrading-03.png)
 
 #### Opzione 1 — Migration
 
@@ -747,8 +737,7 @@ Il vantaggio è che i dati non si spostano mai: lo stato rimane nello stesso ind
 
 La chiave è `delegatecall`: a differenza di `call`, esegue il codice del callee **nel contesto (storage) del caller**. Quindi lo stato vive nel proxy, ma l'implementazione viene letta dal logic. Aggiornare il contratto significa cambiare il puntatore del proxy verso un nuovo logic contract.
 
-![Diagramma Mermaid](images/mermaid-lezione-23-lab-advanced-solidity-vulnerabilities-e-upgrading-04.png)
-*Fig. — Pattern proxy: l'utente interagisce sempre con lo stesso indirizzo (il proxy), ma la logica eseguita è quella del contratto puntato, sostituibile dall'owner.*
+![Pattern proxy: l'utente interagisce sempre con lo stesso indirizzo (il proxy), ma la logica eseguita è quella del contratto puntato, sostituibile dall'owner.](images/mermaid-lezione-23-lab-advanced-solidity-vulnerabilities-e-upgrading-04.png)
 
 > [!definition] `delegatecall`
 >
@@ -778,8 +767,7 @@ Il pattern proxy standard ha un limite: **un solo logic contract** alla volta. M
 
 Il **diamond pattern** (EIP-2535) generalizza il proxy: un unico contratto "diamond" (immutabile, con lo stato) delega a **più logic contracts**, detti **facets**. Ogni selector di funzione (i 4 byte che identificano una funzione nell'ABI) è mappato al facet che la implementa. Quando un utente chiama una funzione, il diamond consulta la mappa, individua il facet competente, e delegate-call-a ad esso.
 
-![Diagramma Mermaid](images/mermaid-lezione-23-lab-advanced-solidity-vulnerabilities-e-upgrading-05.png)
-*Fig. — Pattern diamond: un unico indirizzo esposto all'utente, ma le funzioni sono implementate da più facet. La mappatura funzione → facet è aggiornabile, permettendo di sostituire, aggiungere o rimuovere facet nel tempo.*
+![Pattern diamond: un unico indirizzo esposto all'utente, ma le funzioni sono implementate da più facet. La mappatura funzione → facet è aggiornabile, permettendo di sostituire, aggiungere o rimuovere facet nel tempo.](images/mermaid-lezione-23-lab-advanced-solidity-vulnerabilities-e-upgrading-05.png)
 
 Il cuore del pattern è la **function-to-facet mapping**:
 
@@ -815,8 +803,7 @@ Il diamond gestisce anche più **storage struct** dedicate (una per facet o grup
 
 ## Mappa concettuale
 
-![Diagramma Mermaid](images/mermaid-lezione-23-lab-advanced-solidity-vulnerabilities-e-upgrading-06.png)
-*Fig. — Struttura complessiva dei pattern di upgrading: da un lato i pattern di attacco e le relative difese, dall'altro l'evoluzione dei pattern architetturali per superare l'immutabilità degli smart contract.*
+![Struttura complessiva dei pattern di upgrading: da un lato i pattern di attacco e le relative difese, dall'altro l'evoluzione dei pattern architetturali per superare l'immutabilità degli smart contract.](images/mermaid-lezione-23-lab-advanced-solidity-vulnerabilities-e-upgrading-06.png)
 
 ---
 

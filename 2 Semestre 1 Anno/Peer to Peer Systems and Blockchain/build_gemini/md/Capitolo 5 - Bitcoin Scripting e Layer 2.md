@@ -5,8 +5,9 @@ Tre costrutti avanzati di Bitcoin — **multisignature**, **hash lock** e **time
 ## Multisignature (Multisig)
 
 In un protocollo multi-firma, un gruppo di firmatari autorizza collettivamente una transazione; la verifica avviene tramite le chiavi pubbliche di tutti i partecipanti. L'approccio ingenuo concatena le firme individuali, ma la dimensione cresce linearmente con il numero di firmatari. L'ideale sarebbe una dimensione fissa indipendente dal numero di partecipanti.
-![Confronto tra firme multiple separate e aggregate](images/Pasted-image-20260407113044.png)
-*Figura 1: Confronto tra firme multiple separate e aggregate.*
+
+![Confronto tra firme multiple separate e aggregate.](images/Pasted-image-20260407113044.png)
+
 Bitcoin ha adottato inizialmente la soluzione più semplice con **ECDSA**: firme multiple separate, non aggregate. Le **firme Schnorr**, che permettono l'aggregazione, sono state introdotte solo in seguito con il protocollo **Taproot**.
 
 Un indirizzo multisig accoppia un indirizzo Bitcoin a un locking script che richiede **M** firme valide su **N** chiavi pubbliche associate.
@@ -56,8 +57,7 @@ La soluzione è una **transazione escrow 2-of-3** con Judy come arbitro neutrale
 
 Gli script multisig sono scomodi in pratica. Se un cliente deve pagare un'azienda con un multisig 2-of-5, l'azienda deve trasmettere l'intero script al cliente, che ha bisogno di un wallet speciale per costruirlo. La transazione risultante è cinque volte più grande del normale: fee più alte (a carico del mittente), script troppo lungo per un QR code, e l'intero script resta in RAM nel set UTXO di ogni full node finché non viene speso.
 
-![Schema di funzionamento del Pay-To-Script-Hash (P2SH)](images/Pasted-image-20260407113120.png)
-*Figura 2: Schema di funzionamento del Pay-To-Script-Hash (P2SH).*
+![Schema di funzionamento del Pay-To-Script-Hash (P2SH).](images/Pasted-image-20260407113120.png)
 
 **P2SH** (BIP-16, gennaio 2012) risolve il problema: il destinatario del pagamento è identificato dall'**hash dello script**, non dallo script stesso.
 
@@ -149,8 +149,8 @@ I falsi positivi sono accettati deliberatamente: nascondono quali indirizzi inte
 | **Network (P2P) layer** | Broadcasting dei dati tra i nodi |
 
 La rete P2P è **non strutturata**: chiunque può connettersi. Di default ogni nodo mantiene 117 connessioni TCP in uscita e accetta fino a 8 in entrata sulla porta 8333, senza autenticazione né cifratura.
-![Schema della rete P2P di Bitcoin non strutturata](images/Pasted-image-20260407113308.png)
-*Figura 3: Schema della rete P2P di Bitcoin non strutturata.*
+
+![Schema della rete P2P di Bitcoin non strutturata.](images/Pasted-image-20260407113308.png)
 
 ### Bootstrap e Peer Discovery
 
@@ -166,8 +166,8 @@ Per scoprire ulteriori peer, il nodo invia messaggi `GETADDR` ai vicini, che ris
 ### Handshake
 
 All'apertura di una connessione, i nodi si scambiano un messaggio `VERSION` che contiene tra l'altro il campo **bestHeight** — l'altezza corrente della blockchain del nodo. Se un nodo ha una catena più corta di quella del vicino, richiede i blocchi mancanti.
-![Scambio di messaggi VERSION e processo di Handshake tra nodi Bitcoin](images/Pasted-image-20260407113353.png)
-*Figura 4: Scambio di messaggi VERSION e processo di Handshake tra nodi Bitcoin.*
+
+![Scambio di messaggi VERSION e processo di Handshake tra nodi Bitcoin.](images/Pasted-image-20260407113353.png)
 
 ### Gossip Protocol e Propagazione
 
@@ -337,8 +337,9 @@ Alice conserva questa transazione off-chain. Solo dopo aver ricevuto questa gara
 ## La Rete Lightning: Routing Multi-Hop
 
 Finora abbiamo parlato di canali bilaterali. Il salto concettuale che trasforma i canali in una _rete_ è la **composizione di canali**: Alice può pagare Dave anche se non ha un canale diretto con lui, purché esista un percorso di canali intermedi.
-![Esempio di Routing Multi-Hop nella Lightning Network](images/Pasted-image-20260407113700.png)
-*Figura 5: Esempio di Routing Multi-Hop nella Lightning Network.*
+
+![Esempio di Routing Multi-Hop nella Lightning Network.](images/Pasted-image-20260407113700.png)
+
 Se Alice ha un canale con Bob, e Bob ha un canale con Carol, e Carol ha un canale con Dave, Alice può instradare il pagamento attraverso Bob e Carol. I nodi intermedi **non si fidano l'uno dell'altro** — ognuno impegna i propri fondi solo a condizione che il nodo successivo faccia altrettanto. Questo si ottiene tramite gli **HTLC**.
 
 ### HTLC: Hashed Timelock Contract

@@ -28,8 +28,7 @@ Una rete P2P ben progettata deve essere resistente ad almeno tre famiglie di att
 
 La scelta architetturale fondamentale, fatta questa premessa, è fra due famiglie di overlay:
 
-![Diagramma Mermaid](images/mermaid-lezione-5-lab-p2p-networks-in-bitcoin-ed-ethereum-01.png)
-*Fig. — Le due grandi famiglie di overlay P2P utilizzate dalle principali blockchain.*
+![Le due grandi famiglie di overlay P2P utilizzate dalle principali blockchain.](images/mermaid-lezione-5-lab-p2p-networks-in-bitcoin-ed-ethereum-01.png)
 
 In entrambi i casi lo scopo è lo stesso: **abilitare la comunicazione per un'applicazione decentralizzata**. Le strade scelte per raggiungerlo sono molto diverse.
 
@@ -63,8 +62,7 @@ Un nodo appena avviato segue un protocollo relativamente semplice per entrare a 
 4. Da quel momento il nodo può chiedere altri peer a chi già conosce tramite il messaggio **`getaddr`**, ricevendo in risposta una lista di indirizzi di altri partecipanti alla rete.
 5. Periodicamente, il nodo **annuncia se stesso** (cioè invia la propria `addr`) ad alcuni vicini scelti casualmente, così che l'informazione della sua presenza si propaghi per gossip.
 
-![Diagramma Mermaid](images/mermaid-lezione-5-lab-p2p-networks-in-bitcoin-ed-ethereum-02.png)
-*Fig. — Handshake iniziale di un nuovo nodo Bitcoin: dal seed DNS all'inserimento attivo nella rete.*
+![Handshake iniziale di un nuovo nodo Bitcoin: dal seed DNS all'inserimento attivo nella rete.](images/mermaid-lezione-5-lab-p2p-networks-in-bitcoin-ed-ethereum-02.png)
 
 Una volta stabilita la rete di vicini, i messaggi applicativi veri e propri — transazioni e blocchi — vengono propagati con un meccanismo a tre fasi: `inv` annuncia la disponibilità di un oggetto (un hash), `getdata` lo richiede, infine arriva il `block` o `tx`. Tecniche come **trickle** e **diffusion** randomizzano i tempi di propagazione per ridurre la possibilità che un osservatore risalga al nodo originatore di una transazione.
 
@@ -160,8 +158,7 @@ Gli **identificatori dei peer** in Ethereum sono la chiave pubblica stessa (già
 
 La comunicazione in Ethereum è stratificata in modo che ogni livello si occupi di una sola responsabilità:
 
-![Diagramma Mermaid](images/mermaid-lezione-5-lab-p2p-networks-in-bitcoin-ed-ethereum-03.png)
-*Fig. — Lo stack tiered di Ethereum: RLPx fornisce serializzazione e trasporto cifrato, DEVp2p gestisce le connessioni, e diversi sub-protocolli usano lo stesso canale in multiplex.*
+![Lo stack tiered di Ethereum: RLPx fornisce serializzazione e trasporto cifrato, DEVp2p gestisce le connessioni, e diversi sub-protocolli usano lo stesso canale in multiplex.](images/mermaid-lezione-5-lab-p2p-networks-in-bitcoin-ed-ethereum-03.png)
 
 - **RLPx** (*Recursive Length Prefix* serialization + crittografia) è il livello che rende possibile trovare peer e parlare con loro in modo sicuro. Definisce l'handshake iniziale e la serializzazione binaria dei messaggi.
 - **DEVp2p** è il protocollo che stabilisce e mantiene le connessioni persistenti su cui poi si parlano i sub-protocolli.
@@ -184,8 +181,7 @@ La scoperta dei peer avviene in due fasi distinte, sui due trasporti diversi:
 
 Importante: indipendentemente da quale sub-protocollo applicativo si usi, è sempre RLPx a fornire il canale sottostante di autenticazione e cifratura.
 
-![Diagramma Mermaid](images/mermaid-lezione-5-lab-p2p-networks-in-bitcoin-ed-ethereum-04.png)
-*Fig. — Le due fasi della scoperta e connessione in Ethereum: UDP per trovare peer, TCP per parlarci in sicurezza.*
+![Le due fasi della scoperta e connessione in Ethereum: UDP per trovare peer, TCP per parlarci in sicurezza.](images/mermaid-lezione-5-lab-p2p-networks-in-bitcoin-ed-ethereum-04.png)
 
 #### Monitorare la rete Ethereum
 
@@ -353,8 +349,7 @@ public static void printNetStats(PeerGroup peerGroup) {
 
 Il flusso concettuale è lineare e ricalca esattamente la discovery vista nella lezione precedente:
 
-![Diagramma Mermaid](images/mermaid-lezione-10-lab-bitcoin-con-bitcoinj-01.png)
-*Fig. — Pipeline dell'esempio di connessione: tutto ruota attorno a `PeerGroup`, l'astrazione `bitcoinj` che gestisce il pool di connessioni P2P.*
+![Pipeline dell'esempio di connessione: tutto ruota attorno a `PeerGroup`, l'astrazione `bitcoinj` che gestisce il pool di connessioni P2P.](images/mermaid-lezione-10-lab-bitcoin-con-bitcoinj-01.png)
 
 La chiave è il `PeerGroup`: rappresenta un insieme di connessioni gestite automaticamente, incluso il mantenimento del numero target di peer e la ri-connessione in caso di timeout. `DnsDiscovery` è il meccanismo di bootstrapping che interroga i seed DNS.
 
@@ -536,8 +531,7 @@ Entriamo ora nel cuore della serializzazione del protocollo: si scrive codice Ja
 
 Prima di scrivere codice conviene fissare mentalmente i campi. Una transazione Bitcoin, nel formato serializzato, si compone di:
 
-![Diagramma Mermaid](images/mermaid-lezione-11-lab-bitcoin-transactions-e-scripts-01.png)
-*Fig. — I campi di una transazione Bitcoin. `marker`/`flag` e `witness data` sono presenti solo nelle transazioni SegWit.*
+![I campi di una transazione Bitcoin. `marker`/`flag` e `witness data` sono presenti solo nelle transazioni SegWit.](images/mermaid-lezione-11-lab-bitcoin-transactions-e-scripts-01.png)
 
 La distinzione cruciale per il codice è fra transazione **legacy** e **SegWit**: nelle legacy la firma vive dentro `scriptSig` (un campo dell'input); nelle SegWit viene spostata in una sezione separata (`witness data`) in fondo alla transazione, lasciando `scriptSig` vuoto. Questo cambia il layout binario e richiede il parser di gestire i due casi. Bitcoinj si occupa di distinguerli automaticamente leggendo il **marker byte** (`0x00`) e il **flag byte** (`0x01`) che, se presenti subito dopo la version, segnalano una transazione SegWit.
 
@@ -1205,8 +1199,7 @@ dove:
 
 Gli indirizzi non decodificabili vengono rimpiazzati con un progressivo `#0`, `#1`, ... in modo da avere comunque un identificatore univoco per riga.
 
-![Diagramma Mermaid](images/mermaid-lezione-13-lab-script-classification-e-blk-dat-01.png)
-*Fig. — Pipeline di `BCParser`: dai file blk.dat al CSV-like con statistiche aggregate sulla blockchain intera.*
+![Pipeline di `BCParser`: dai file blk.dat al CSV-like con statistiche aggregate sulla blockchain intera.](images/mermaid-lezione-13-lab-script-classification-e-blk-dat-01.png)
 
 > [!tip] Il limite: niente UTXO set
 >
@@ -1238,8 +1231,7 @@ Un ulteriore punto di debolezza è che le transazioni vengono diffuse nella rete
 
 Un attacco di deanonimizzazione mira a collegare le identità reali del mondo fisico con gli indirizzi pseudonimi della blockchain. Il processo si articola in tre stadi progressivi:
 
-![Diagramma Mermaid](images/mermaid-lezione-17-lab-bitcoin-anonimato-e-deanonimizzazione-01.png)
-*Fig. — Pipeline di deanonimizzazione: dalla blockchain al grafo delle identità reali.*
+![Pipeline di deanonimizzazione: dalla blockchain al grafo delle identità reali.](images/mermaid-lezione-17-lab-bitcoin-anonimato-e-deanonimizzazione-01.png)
 
 Il primo stadio è puramente passivo: si costruisce il **transaction graph** dalla blockchain pubblica, dove i nodi sono indirizzi e gli archi rappresentano flussi di fondi. Il secondo stadio applica **euristiche di clustering** per raggruppare indirizzi che probabilmente appartengono allo stesso utente, ottenendo un **users graph** dove i nodi sono cluster. Il terzo stadio arricchisce il users graph con **informazioni esterne** per etichettare i cluster con identità reali, producendo l'**identities graph**.
 

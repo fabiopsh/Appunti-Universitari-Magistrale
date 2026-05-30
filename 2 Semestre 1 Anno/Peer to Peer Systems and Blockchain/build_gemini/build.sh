@@ -6,7 +6,7 @@ echo "==> 1. Estrazione immagini base64"
 python3 extract_images.py
 
 echo "==> 2. Rimozione duplicati iCloud in build/md/"
-find md -maxdepth 1 -name "* 2.md" ! -name "*Part 2.md" -print -delete
+# find md -maxdepth 1 -name "* 2.md" ! -name "*Part 2.md" -print -delete
 
 echo "==> 3. Risoluzione wikilink Obsidian -> images/"
 python3 resolve_wikilinks.py
