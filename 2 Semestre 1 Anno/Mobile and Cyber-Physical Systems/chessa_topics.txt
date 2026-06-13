@@ -1,0 +1,32 @@
+## Interoperabilità
+## IoT & Security
+## Publish/Subscribe & MQTT
+## MQTT – II (QoS 2)
+## MQTT-III — Topic, Sessioni, Retained Messages, Last Will & Keep Alive
+## ZigBee - I (Join through Association)
+## ZigBee – II (Application Layer Stack)
+## ZigBee - III (Topologie di Rete)
+## ZigBee - IV (Indirizzamento ad Albero)
+## ZigBee - V (Tabella APS / Binding Table)
+## ZigBee - VI (Cluster e Binding tra Dispositivi)
+## Duty Cycle - I (Calcolo del Duty Cycle)
+## Duty Cycle - II (Impatto sulla Vita della Batteria)
+## Embedded Programming - I (Modello Arduino)
+## Embedded Programming - II (Modello TinyOS/Event-Driven)
+## Arduino - Interrupt
+## SMAC (Sensor-MAC)
+## BMAC - I (Struttura del Protocollo)
+## BMAC - II (Trade-off t_check e Vita del Trasmettitore)
+## X-MAC / B-MAC (Confronto LPL vs X-MAC)
+## IEEE 802.15.4 - I (Struttura del Superframe)
+## IEEE 802.15.4 - II (Indirect Data Transfer)
+## IEEE 802.15.4 - III (Protocollo di Associazione)
+## Energy Harvesting — Domande Generali
+## Energy Harvesting - I (Grafico Ps vs Pc)
+## Energy Harvesting – II (Stima Stato di Carica)
+## Energy Harvesting – III (Approccio Kansal all'Energy Neutrality)
+## Energy Harvesting – IV (Task Model per l'Energy Neutrality)
+## Directed Diffusion
+## GPSR - I (Greedy Forwarding e Void)
+## GPSR - II (Perimeter Routing / Face Traversal)
+## GPSR - III (Planarizzazione: Gabriel Graph e RNG)

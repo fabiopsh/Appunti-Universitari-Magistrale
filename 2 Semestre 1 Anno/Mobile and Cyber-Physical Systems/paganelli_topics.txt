@@ -1,0 +1,18 @@
+## Hidden Terminal (Terminale Nascosto)
+## Exposed Terminal (Terminale Esposto)
+## RTS/CTS
+## Mobile Networks — I
+## Mobile Networks — II
+## Mobile Networks — III
+## SDN — Generalized Forwarding
+## SDN — Example
+## SDN — Architecture
+## OpenFlow Switch
+## SDN — Control/Data Plane Interaction Example
+## NFV — Forwarding Graph
+## NFV — Management and Orchestration
+## Network Slicing
+## Fourier Series (Serie di Fourier)
+## DFT (Discrete Fourier Transform)
+## Sampling and Aliasing (Campionamento e Aliasing)
+## Quantization (Quantizzazione)

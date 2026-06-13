@@ -5,5 +5,6 @@
     "margin": "0",
     "downscalePercent": 100
   },
-  "attachmentFolderPath": "General/Images and Documents"
+  "attachmentFolderPath": "General/Images and Documents",
+  "readableLineLength": true
 }
